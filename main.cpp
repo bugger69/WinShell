@@ -22,7 +22,7 @@ void shell_loop(void)
         std::cout << "> ";
         std::getline(std::cin, line);
         shell_parse(line, args);
-        int status = shell_execute(args);
+        status = shell_execute(args);
 
         line.clear();
         args.clear();
