@@ -1,14 +1,23 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
+#include <cstdlib>
 
 int shell_execute(std::vector<std::string> &args)
 {
     return EXIT_SUCCESS;
 }
 
-void shell_parse(std ::string &line, std::vector<std::string> &args)
+void shell_parse(const std::string &line, std::vector<std::string> &args)
 {
+    std::stringstream line_stream(line);
+    std::string arg;
+    while(std::getline(line_stream, arg, ' ')) {
+        if(!arg.empty()) {
+            args.push_back(arg);
+        }
+    }
 }
 
 void shell_loop(void)
