@@ -3,13 +3,13 @@
 #include <vector>
 #include "shell_cmds.hpp"
 
-std::vector<std::string> shell_cmds = {
+std::vector<std::string> shell_cmds = { // TODO: Change this into a map of commands to functions
     "cd",
     "exit",
     "help"
 };
 
-int shell_chdir(std::vector<std::string> &args) {
+int shell_chdir(std::vector<std::string> &args) { 
     return EXIT_SUCCESS;
 }
 
