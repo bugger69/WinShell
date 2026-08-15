@@ -99,7 +99,7 @@ void shell_loop(void)
 int main()
 {
 
-    shell_loop(); // TODO: Test if all functions are working properly after changing the table to map
+    shell_loop(); // TODO: Add cd command support
 
     return EXIT_SUCCESS;
 }

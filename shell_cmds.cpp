@@ -21,7 +21,13 @@ int shell_exit(std::vector<std::string> &args) {
 }
 
 int shell_help(std::vector<std::string> &args) {
-    std::cout << "shell_help called" << std::endl;
+    std::cout << "WinShell Help: " << std::endl;
+    std::cout << "Write program names and arguments, and hit enter" << std::endl;
+    std::cout << "The following commands are available by default:" << std::endl;
+    for(auto it : shell_cmds) {
+        std::cout << "  " << it.first << std::endl;
+    }
+    // TODO: Add man command print here once implemented
     return EXIT_SUCCESS;
 }
 
