@@ -86,20 +86,20 @@ void shell_loop(void)
     do
     {
         std::cout << "> ";
-        std::getline(std::cin, line); // TODO: Add support for multi-line and file commands later(using string view), shell_read_line() function will be created for that
+        std::getline(std::cin, line);
         shell_parse(line, args);
         status = shell_execute(args);
 
         line.clear();
         args.clear();
-        std::cin.ignore();
+        // std::cin.ignore();
     } while (!status);
 }
 
 int main()
 {
 
-    shell_loop();
+    shell_loop(); // TODO: Test if all functions are working properly after changing the table to map
 
     return EXIT_SUCCESS;
 }

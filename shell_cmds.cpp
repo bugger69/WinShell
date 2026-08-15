@@ -1,15 +1,17 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include "shell_cmds.hpp"
 
-std::vector<std::string> shell_cmds = { // TODO: Change this into a map of commands to functions
-    "cd",
-    "exit",
-    "help"
+std::map<std::string, int(*)(std::vector<std::string> &)> shell_cmds = {
+    {"cd", shell_chdir},
+    {"exit", shell_exit},
+    {"help", shell_help}
 };
 
-int shell_chdir(std::vector<std::string> &args) { 
+int shell_chdir(std::vector<std::string> &args) {
+    std::cout << "Changing directory to: " << args[1] << std::endl;
     return EXIT_SUCCESS;
 }
 
@@ -19,21 +21,16 @@ int shell_exit(std::vector<std::string> &args) {
 }
 
 int shell_help(std::vector<std::string> &args) {
+    std::cout << "shell_help called" << std::endl;
     return EXIT_SUCCESS;
 }
 
 int shell_cmd_handler(std::vector<std::string> &args) {
     if (args.empty()) return EXIT_FAILURE;
     for(auto it : shell_cmds) {
-        if(args[0] == it) {
-            if(it == "cd") {
-                return shell_chdir(args);
-            } else if(it == "exit") {
-                return shell_exit(args);
-            } else if(it == "help") {
-                return shell_help(args);
-            }
+        if(args[0] == it.first) {
+            return it.second(args);
         }
     }
-    return EXIT_SUCCESS;
+    return EXIT_FAILURE;
 }
