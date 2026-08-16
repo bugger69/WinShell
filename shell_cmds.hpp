@@ -4,6 +4,7 @@
 #include <map>
 
 int shell_chdir(std::vector<std::string> &args);
+int shell_echo(std::vector<std::string> &args);
 int shell_exit(std::vector<std::string> &args);
 int shell_help(std::vector<std::string> &args);
 int shell_cmd_handler(std::vector<std::string> &args);

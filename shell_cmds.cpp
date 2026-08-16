@@ -6,12 +6,21 @@
 
 std::map<std::string, int(*)(std::vector<std::string> &)> shell_cmds = {
     {"cd", shell_chdir},
+    {"echo", shell_echo},
     {"exit", shell_exit},
     {"help", shell_help}
 };
 
 int shell_chdir(std::vector<std::string> &args) {
     std::cout << "Changing directory to: " << args[1] << std::endl;
+    return EXIT_SUCCESS;
+}
+
+int shell_echo(std::vector<std::string> &args) {
+    for(int i = 1; i < args.size(); i++) {
+        std::cout << args[i] << " ";
+    }
+    std::cout << std::endl;
     return EXIT_SUCCESS;
 }
 
