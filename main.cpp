@@ -8,6 +8,11 @@
 #include "shell_cmds.hpp"
 
 #define DELIMITERS " \t\r\n\a"
+#define DELIMITER " \r\n"
+
+int shell_find_exec(std::vector<std::string> &args) {
+    return EXIT_FAILURE; // TODO: Implement this function to find executables in the system PATH
+}
 
 int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi) // TODO: Use windows CreateProcess and CreateThread to implement process forking + exec.
 {
@@ -59,8 +64,10 @@ int shell_execute(std::vector<std::string> &args) // TODO: add basic commands
 
     status = shell_cmd_handler(args); // TODO: Write code for all shell commands, and add support for more commands later
     // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS
-    if(status == EXIT_FAILURE) {
+    if(status == EXIT_FAILURE && shell_find_exec(args) == EXIT_SUCCESS) {
         status = shell_process_launch(args, si, pi);
+    } else if(status == EXIT_FAILURE) {
+        std::cerr << args[0] << ": command not found" << std::endl;
     }
 
     return EXIT_SUCCESS;
@@ -95,11 +102,11 @@ void shell_loop(void)
         // std::cin.ignore();
     } while (!status);
 }
-
+// TODO: implement type and echo commands too
 int main()
 {
 
-    shell_loop(); // TODO: Add cd command support
+    shell_loop(); // TODO: Add cd command support, and finish of string_view stuff
 
     return EXIT_SUCCESS;
 }
