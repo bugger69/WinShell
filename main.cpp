@@ -6,6 +6,7 @@
 #include <limits>
 #include <windows.h>
 #include "shell_cmds.hpp"
+#include "utils.hpp"
 
 #define DELIMITERS " \t\r\n\a"
 #define DELIMITER " \r\n"
@@ -106,7 +107,7 @@ void shell_loop(void)
 int main()
 {
 
-    shell_loop(); // TODO: Add cd command support, and finish of string_view stuff
+    shell_loop(); // TODO: finish off string_view stuff later, and test if path variable is working
 
     return EXIT_SUCCESS;
 }

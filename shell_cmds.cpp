@@ -1,8 +1,10 @@
 #include <iostream>
+#include <filesystem>
 #include <string>
 #include <vector>
 #include <map>
 #include "shell_cmds.hpp"
+#include "utils.hpp"
 
 std::map<std::string, int(*)(std::vector<std::string> &)> shell_cmds = {
     {"cd", shell_chdir},
@@ -42,19 +44,39 @@ int shell_help(std::vector<std::string> &args) {
 }
 
 int shell_type(std::vector<std::string> &args) {
-    int cmdType = SHELL_UNKNOWN;
+    int cmdType = SHELL_CMD_TYPE_UNKNOWN;
+    const char* path_env = find_path_var();
+    std::string path_string(path_env);
+    std::stringstream ss(path_env);
+    std::string directory, finaldir;
+
     for (auto it : shell_cmds) {
         if(args[1] == it.first) {
-            cmdType = SHELL_BUILTIN; // Built-in command
+            cmdType = SHELL_CMD_TYPE_BUILTIN; // Built-in command
             break;
         }
     }
-    if(cmdType == SHELL_UNKNOWN) {
+    if(cmdType == SHELL_CMD_TYPE_UNKNOWN) {
         // TODO: check if the executable exits in path
+        std::string exec = args[1] + ".exe";
+        while(std::getline(ss, directory, ';')) {
+            fs::path target_path(directory);
+            if(fs::exists(target_path) && fs::is_directory(target_path)) {
+                for(const auto& entry : fs::directory_iterator(target_path)) {
+                    if(fs::is_regular_file(entry) && entry.path().filename() == exec && execute_permission(entry.path())) {
+                        cmdType = SHELL_CMD_TYPE_EXEC;
+                        finaldir = directory;
+                    }
+                }
+            }
+        }
     }
     switch(cmdType) {
-        case SHELL_BUILTIN:
+        case SHELL_CMD_TYPE_BUILTIN:
             std::cout << args[1] << " is a shell builtin." << std::endl;
+            break;
+        case SHELL_CMD_TYPE_EXEC:
+            std::cout << args[1] << " is " << finaldir << std::endl;
             break;
         default:
             std::cout << "type: " << args[1] <<": not found" << std::endl;

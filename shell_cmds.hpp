@@ -4,8 +4,9 @@
 #include <map>
 
 // Type Headers
-#define SHELL_UNKNOWN -1
-#define SHELL_BUILTIN 0
+#define SHELL_CMD_TYPE_UNKNOWN -1
+#define SHELL_CMD_TYPE_BUILTIN 0
+#define SHELL_CMD_TYPE_EXEC 1
 
 int shell_chdir(std::vector<std::string> &args);
 int shell_echo(std::vector<std::string> &args);
