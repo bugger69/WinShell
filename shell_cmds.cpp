@@ -8,6 +8,7 @@ std::map<std::string, int(*)(std::vector<std::string> &)> shell_cmds = {
     {"cd", shell_chdir},
     {"echo", shell_echo},
     {"exit", shell_exit},
+    {"type", shell_type},
     {"help", shell_help}
 };
 
@@ -37,6 +38,27 @@ int shell_help(std::vector<std::string> &args) {
         std::cout << "  " << it.first << std::endl;
     }
     // TODO: Add man command print here once implemented
+    return EXIT_SUCCESS;
+}
+
+int shell_type(std::vector<std::string> &args) {
+    int cmdType = SHELL_UNKNOWN;
+    for (auto it : shell_cmds) {
+        if(args[1] == it.first) {
+            cmdType = SHELL_BUILTIN; // Built-in command
+            break;
+        }
+    }
+    if(cmdType == SHELL_UNKNOWN) {
+        // TODO: check if the executable exits in path
+    }
+    switch(cmdType) {
+        case SHELL_BUILTIN:
+            std::cout << args[1] << " is a shell builtin." << std::endl;
+            break;
+        default:
+            std::cout << "type: " << args[1] <<": not found" << std::endl;
+    }
     return EXIT_SUCCESS;
 }
 
