@@ -8,18 +8,45 @@
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
-#define DELIMITERS " \t\r\n\a"
-#define DELIMITER " \r\n"
+std::string shell_find_exec(std::vector<std::string> &args, int &found) {
+    std::string exec = args[0] + ".exe";
+    const char* path_env = find_path_var();
+    std::string path_string(path_env), exec_path;
+    std::stringstream ss(path_env);
+    std::string directory, finaldir;
 
-int shell_find_exec(std::vector<std::string> &args) {
-    return EXIT_FAILURE; // TODO: Implement this function to find executables in the system PATH
+    while(std::getline(ss, directory, ';')) {
+        fs::path target_path(directory);
+        if(fs::exists(target_path) && fs::is_directory(target_path)) {
+            for(const auto& entry : fs::directory_iterator(target_path)) {
+                if(fs::is_regular_file(entry) && entry.path().filename() == exec && execute_permission(entry.path())) {
+                    finaldir = directory;
+                    found = EXIT_SUCCESS;
+                }
+            }
+        }
+    }
+
+    exec_path = finaldir + '/' + exec;
+
+    return exec_path; // TODO: Implement this function to find executables in the system PATH
 }
 
 int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi) // TODO: Use windows CreateProcess and CreateThread to implement process forking + exec.
 {
+    int cmd_found = EXIT_FAILURE;
     std::wstring command;
-    for (const auto &arg : args) {
-        command += std::wstring(arg.begin(), arg.end()) + L" ";
+    std::string execPath = shell_find_exec(args, cmd_found);
+
+    if(cmd_found == EXIT_FAILURE) return EXIT_SUCCESS;
+
+    for (int i = 0; i < args.size(); i++) {
+        std::string arg = args[i];
+        if(i == 0) {
+            command += std::wstring(execPath.begin(), execPath.end()) + L" ";
+        } else {
+            command += std::wstring(arg.begin(), arg.end()) + L" ";
+        }
     }
 
     bool status = CreateProcessW(
@@ -63,11 +90,9 @@ int shell_execute(std::vector<std::string> &args) // TODO: add basic commands
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    status = shell_cmd_handler(args); // TODO: Write code for all shell commands, and add support for more commands later
-    // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS
-    if(status == EXIT_FAILURE && shell_find_exec(args) == EXIT_SUCCESS) {
-        status = shell_process_launch(args, si, pi);
-    } else if(status == EXIT_FAILURE) {
+    // TODO: Write code for all shell commands, and add support for more commands later
+    // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS  
+    if(shell_cmd_handler(args) == EXIT_FAILURE && shell_process_launch(args, si, pi) == EXIT_FAILURE) {
         std::cerr << args[0] << ": command not found" << std::endl;
     }
 
@@ -107,7 +132,7 @@ void shell_loop(void)
 int main()
 {
 
-    shell_loop(); // TODO: finish off string_view stuff later, and test if path variable is working
+    shell_loop(); // TODO: finish off string_view stuff later, and understand filesystem library plus implement executables too
 
     return EXIT_SUCCESS;
 }

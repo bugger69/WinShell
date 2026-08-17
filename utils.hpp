@@ -8,6 +8,8 @@
 
 namespace fs = std::filesystem;
 
+#define DELIMITERS " \t\r\n\a"
+#define DELIMITER " \r\n"
 #define EXEC_PERMISSIONS (fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec)
 
 bool execute_permission(const fs::path exec_path);
