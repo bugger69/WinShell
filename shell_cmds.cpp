@@ -11,6 +11,7 @@ std::map<std::string, int(*)(std::vector<std::string> &)> shell_cmds = {
     {"echo", shell_echo},
     {"exit", shell_exit},
     {"type", shell_type},
+    {"pwd", shell_pwd},
     {"help", shell_help}
 };
 
@@ -40,6 +41,13 @@ int shell_help(std::vector<std::string> &args) {
         std::cout << "  " << it.first << std::endl;
     }
     // TODO: Add man command print here once implemented
+    return EXIT_SUCCESS;
+}
+
+int shell_pwd(std::vector<std::string> &args) {
+    fs::path curr_dir = fs::current_path();
+    std::string currPath = curr_dir.string();
+    std::cout << currPath << std::endl;
     return EXIT_SUCCESS;
 }
 
