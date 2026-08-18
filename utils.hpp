@@ -12,5 +12,6 @@ namespace fs = std::filesystem;
 #define DELIMITER " \r\n"
 #define EXEC_PERMISSIONS (fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec)
 
+/* Path helpers */
 bool execute_permission(const fs::path exec_path);
 const char* find_path_var();

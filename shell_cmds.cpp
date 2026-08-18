@@ -16,7 +16,13 @@ std::map<std::string, int(*)(std::vector<std::string> &)> shell_cmds = {
 };
 
 int shell_chdir(std::vector<std::string> &args) {
-    std::cout << "Changing directory to: " << args[1] << std::endl;
+    std::string new_dir(args[1]);
+
+    try {
+        fs::current_path(args[1]);
+    } catch (const fs::filesystem_error e) {
+        std::cerr << e.what() << std::endl;
+    }
     return EXIT_SUCCESS;
 }
 
@@ -65,14 +71,13 @@ int shell_type(std::vector<std::string> &args) {
         }
     }
     if(cmdType == SHELL_CMD_TYPE_UNKNOWN) {
-        // TODO: check if the executable exits in path
         std::string exec = args[1] + ".exe";
         while(std::getline(ss, directory, ';')) {
             fs::path target_path(directory);
             if(fs::exists(target_path) && fs::is_directory(target_path)) {
                 for(const auto& entry : fs::directory_iterator(target_path)) {
                     if(fs::is_regular_file(entry) && entry.path().filename() == exec && execute_permission(entry.path())) {
-                        cmdType = SHELL_CMD_TYPE_EXEC;
+                        cmdType = SHELL_CMD_TYPE_EXEC; // Executable
                         finaldir = directory;
                     }
                 }
