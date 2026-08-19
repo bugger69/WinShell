@@ -27,7 +27,7 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found) {
         }
     }
 
-    exec_path = finaldir + '/' + exec;
+    if(finaldir.size()) exec_path = finaldir + '/' + exec;
 
     return exec_path; // TODO: Implement this function to find executables in the system PATH
 }
@@ -38,7 +38,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
     std::wstring command;
     std::string execPath = shell_find_exec(args, cmd_found);
 
-    if(cmd_found == EXIT_FAILURE) return EXIT_SUCCESS;
+    if(cmd_found == EXIT_FAILURE) return EXIT_FAILURE;
 
     for (int i = 0; i < args.size(); i++) {
         std::string arg = args[i];
@@ -86,9 +86,13 @@ int shell_execute(std::vector<std::string> &args) // TODO: add basic commands
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
     int status;
+
+    if(args.empty()) goto end;
+
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
+
 
     // TODO: Write code for all shell commands, and add support for more commands later
     // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS  
@@ -96,6 +100,7 @@ int shell_execute(std::vector<std::string> &args) // TODO: add basic commands
         std::cerr << args[0] << ": command not found" << std::endl;
     }
 
+end:
     return EXIT_SUCCESS;
 }
 
@@ -133,6 +138,6 @@ int main()
 {
 
     shell_loop(); // TODO: finish off string_view stuff later, and understand filesystem library plus implement executables too
-
+    // TODO: Unknown command handling is broken, fix it too.
     return EXIT_SUCCESS;
 }

@@ -19,9 +19,9 @@ int shell_chdir(std::vector<std::string> &args) {
     std::string new_dir(args[1]);
 
     try {
-        fs::current_path(args[1]);
+        fs::current_path(args[1]); // TODO: make 3 cases, one for absolute paths, one for dirs starting with . or .., one for ~
     } catch (const fs::filesystem_error e) {
-        std::cerr << e.what() << std::endl;
+        std::cerr << "cd: " << e.what() << std::endl;
     }
     return EXIT_SUCCESS;
 }
