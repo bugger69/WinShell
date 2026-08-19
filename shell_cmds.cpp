@@ -22,7 +22,7 @@ int shell_chdir(std::vector<std::string> &args) {
         const char* home = nullptr;
         if(args[1][0] == '~') {
             home = std::getenv("USERPROFILE");
-            fs::current_path(home);
+            fs::current_path(home); // TODO: add logic to strip ~ from file path and use the remaining to cd after reaching ~ dir.
         } else {
             fs::current_path(args[1]); // TODO: make 3 cases, one for absolute paths, one for dirs starting with . or .., one for ~
         }
