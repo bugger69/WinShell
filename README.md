@@ -8,6 +8,7 @@ in type and executing them when called.
 ## How to set up
 Clone the repo using git clone.
 
+And then execute the following:
 ```bash  
 g++ main.cpp shell_cmds.cpp utils.cpp > WinShell.exe
 ```
