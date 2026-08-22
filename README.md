@@ -10,7 +10,7 @@ Clone the repo using git clone.
 
 And then execute the following:
 ```bash  
-g++ main.cpp shell_cmds.cpp utils.cpp > WinShell.exe
+g++ main.cpp shell_cmds.cpp utils.cpp -o WinShell.exe
 ```
 
 And now run:
