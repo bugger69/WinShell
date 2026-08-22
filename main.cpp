@@ -29,7 +29,7 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found) {
 
     if(finaldir.size()) exec_path = finaldir + '/' + exec;
 
-    return exec_path; // TODO: Implement this function to find executables in the system PATH
+    return exec_path;
 }
 
 int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi) // TODO: Use windows CreateProcess and CreateThread to implement process forking + exec.
@@ -109,6 +109,15 @@ void shell_parse(const std::string &line, std::vector<std::string> &args)
     int i = 0;
     std::string curr;
     while(i < line.size()) {
+        if(line[i] == '\"') {
+            i++;
+            while(line[i] != '\"') {
+                curr += line[i];
+                i++;
+            }
+            i++;
+            continue;
+        }
         if(line[i] == '\'') {
             i++;
             while(line[i] != '\'') {
