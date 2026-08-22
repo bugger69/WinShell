@@ -106,13 +106,29 @@ end:
 
 void shell_parse(const std::string &line, std::vector<std::string> &args)
 {
-    std::stringstream line_stream(line);
-    std::string arg;
-    while(std::getline(line_stream, arg, DELIMITERS[0])) { // TODO: Add support for quoted arguments, and other delimiters later (using string view)
-        if(!arg.empty()) {
-            args.push_back(arg);
+    int i = 0;
+    std::string curr;
+    while(i < line.size()) {
+        if(line[i] == '\'') {
+            i++;
+            while(line[i] != '\'') {
+                curr += line[i];
+                i++;
+            }
+            i++;
+            continue;
         }
+        if(line[i] == ' ') {
+            if(!curr.empty()) args.push_back(curr);
+            curr = "";
+            i++;
+            continue;
+        }
+        curr += line[i];
+        i++;
     }
+    if(!curr.empty()) args.push_back(curr);
+    curr = "";
 }
 
 void shell_loop(void)
