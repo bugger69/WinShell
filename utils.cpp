@@ -22,3 +22,22 @@ bool execute_permission(const fs::path exec_path) {
     fs::perms p = fs::status(exec_path).permissions();
     return ((p & EXEC_PERMISSIONS) != fs::perms::none);
 }
+
+bool isEscape(const std::string &line, int i) {
+    if(i > 0 && line[i - 1] == '\\') return true;
+    return false;
+}
+
+bool isCurrEscape(const std::string &line, int i) {
+    if(i > 0 && line[i - 1] != '\\' && line[i] == '\\') return true;
+    return false;
+}
+
+bool isDoubleQuoteSp(const std::string &line, int i) {
+    for(auto it : DOUBLEQUOTESPCHARS) {
+        if(i < line.size() - 1 && line[i] == '\\' && line[i + 1] == it) {
+            return true;
+        }
+    }
+    return false;
+}

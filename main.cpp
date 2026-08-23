@@ -8,16 +8,6 @@
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
-bool isEscape(const std::string &line, int i) {
-    if(i > 0 && line[i - 1] == '\\') return true;
-    return false;
-}
-
-bool isCurrEscape(const std::string &line, int i) {
-    if(i > 0 && line[i - 1] != '\\' && line[i] == '\\') return true;
-    return false;
-}
-
 std::string shell_find_exec(std::vector<std::string> &args, int &found) {
     std::string exec = args[0] + ".exe";
     const char* path_env = find_path_var();
@@ -122,8 +112,14 @@ void shell_parse(const std::string &line, std::vector<std::string> &args)
         if(!isEscape(line, i) && line[i] == '\"') {
             i++;
             while(line[i] != '\"') {
-                curr += line[i];
-                i++;
+                if(isDoubleQuoteSp(line, i)) {
+                    curr += line[i + 1];
+                    i += 2;
+                } else {
+                    curr += line[i];
+                    i++;
+                }
+               
             }
             i++;
             continue;
