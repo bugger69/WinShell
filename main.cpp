@@ -8,6 +8,16 @@
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
+bool isEscape(const std::string &line, int i) {
+    if(i > 0 && line[i - 1] == '\\') return true;
+    return false;
+}
+
+bool isCurrEscape(const std::string &line, int i) {
+    if(i > 0 && line[i - 1] != '\\' && line[i] == '\\') return true;
+    return false;
+}
+
 std::string shell_find_exec(std::vector<std::string> &args, int &found) {
     std::string exec = args[0] + ".exe";
     const char* path_env = find_path_var();
@@ -109,7 +119,7 @@ void shell_parse(const std::string &line, std::vector<std::string> &args)
     int i = 0;
     std::string curr;
     while(i < line.size()) {
-        if(line[i] == '\"') {
+        if(!isEscape(line, i) && line[i] == '\"') {
             i++;
             while(line[i] != '\"') {
                 curr += line[i];
@@ -118,7 +128,7 @@ void shell_parse(const std::string &line, std::vector<std::string> &args)
             i++;
             continue;
         }
-        if(line[i] == '\'') {
+        if(!isEscape(line, i) && line[i] == '\'') {
             i++;
             while(line[i] != '\'') {
                 curr += line[i];
@@ -127,13 +137,13 @@ void shell_parse(const std::string &line, std::vector<std::string> &args)
             i++;
             continue;
         }
-        if(line[i] == ' ') {
+        if(!isEscape(line, i) && line[i] == ' ') {
             if(!curr.empty()) args.push_back(curr);
             curr = "";
             i++;
             continue;
         }
-        curr += line[i];
+        if(!isCurrEscape(line, i)) curr += line[i];
         i++;
     }
     if(!curr.empty()) args.push_back(curr);
