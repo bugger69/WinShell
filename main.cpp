@@ -8,7 +8,7 @@
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
-std::string shell_find_exec(std::vector<std::string> &args, int &found) {
+std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TODO: Add support for full file paths
     std::string exec = args[0] + ".exe";
     const char* path_env = find_path_var();
     std::string path_string(path_env), exec_path;
