@@ -12,7 +12,7 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TOD
     std::string exec = args[0] + ".exe";
     const char* path_env = find_path_var();
     std::string path_string(path_env), exec_path;
-    std::stringstream ss(path_env);
+    std::stringstream ss(path_string);
     std::string directory, finaldir;
 
     while(std::getline(ss, directory, ';')) {
@@ -168,7 +168,7 @@ void shell_loop(void)
 int main()
 {
 
-    shell_loop(); // TODO: finish off string_view stuff later, and understand filesystem library plus implement executables too
-    // TODO: Unknown command handling is broken, fix it too.
+    shell_loop(); // TODO: add modules, and to that add a basic hello executable, and add the path to that to the path string too.
+    
     return EXIT_SUCCESS;
 }
