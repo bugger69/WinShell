@@ -33,8 +33,8 @@ cmake --build .
 ```bash  
 g++ -Iinclude src/main.cpp src/shell_cmds.cpp src/utils.cpp -o WinShell.exe
 ```
-
-- And now run:
+### Running the program
+- And no matter which way you compiled, run:
 ```bash
 WinShell.exe 
 ```
