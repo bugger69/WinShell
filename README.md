@@ -9,6 +9,10 @@ in type and executing them when called.
 You can build via two ways (I just added cmake just in case the project becomes complicated in the future.)
 
 - Clone the repo using git clone.
+```bash
+git clone https://github.com/bugger69/WinShell.git
+cd WinShell
+```
 
 ### Using CMake
 - Make sure you have cmake installed, and now create a build dir via the following commands.
