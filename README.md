@@ -29,7 +29,7 @@ cmake --build .
 ```
 
 ### Compiling directly
-- And then execute the following:
+- You can directly execute the following:
 ```bash  
 g++ -Iinclude src/main.cpp src/shell_cmds.cpp src/utils.cpp -o WinShell.exe
 ```
