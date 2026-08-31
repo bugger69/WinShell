@@ -7,6 +7,11 @@
 #include <windows.h>
 #include "utils.hpp"
 
+bool endsWith(const std::string& mainStr, const std::string& suffix) {
+    if (mainStr.length() < suffix.length()) return false;
+    return mainStr.rfind(suffix) == (mainStr.length() - suffix.length());
+}
+
 const char* find_path_var() {
     const char* path_env = std::getenv("PATH");
     if(!path_env) {

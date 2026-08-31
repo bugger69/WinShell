@@ -9,7 +9,7 @@
 #define SHELL_CMD_TYPE_EXEC 1
 
 // Default executables array
-#define EXEC_BIN_PATH ""
+#define EXEC_BIN_PATH "./modules/"
 
 int shell_chdir(std::vector<std::string> &args);
 int shell_echo(std::vector<std::string> &args);

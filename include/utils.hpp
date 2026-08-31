@@ -16,6 +16,7 @@ namespace fs = std::filesystem;
 /* Path helpers */
 bool execute_permission(const fs::path exec_path);
 const char* find_path_var();
+bool endsWith(const std::string& mainStr, const std::string& suffix);
 
 /* Escape Char helpers */
 bool isEscape(const std::string &line, int i);

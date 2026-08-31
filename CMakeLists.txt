@@ -8,3 +8,5 @@ set(CMAKE_CXX_STANDARD_REQUIRED)
 add_executable(WinShell src/main.cpp src/shell_cmds.cpp src/utils.cpp)
 
 target_include_directories(WinShell PRIVATE ${CMAKE_SOURCE_DIR}/include)
+
+add_subdirectory(modules)

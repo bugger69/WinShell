@@ -33,9 +33,12 @@ cmake --build .
 ```
 
 ### Compiling directly
-- You can directly execute the following:
+Now since we've added support for modules, cmake method stays the same but in this method you'll have to compile each module seperately.
+- You can execute the following:
 ```bash  
 g++ -Iinclude src/main.cpp src/shell_cmds.cpp src/utils.cpp -o WinShell.exe
+cd modules
+g++ hello/main.cpp -o hello.exe
 ```
 ### Running the program
 - And no matter which way you compiled, run:

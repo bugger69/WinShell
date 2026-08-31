@@ -8,10 +8,11 @@
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
-std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TODO: Add support for full file paths
-    std::string exec = args[0] + ".exe";
+std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TODO: Add support for full file paths and ones starting with <exec>.exe
+    std::string exec = !endsWith(args[0], ".exe") ? args[0] + ".exe" : args[0];
     const char* path_env = find_path_var();
-    std::string path_string(path_env), exec_path;
+    std::string path_string(path_env), local_execs(EXEC_BIN_PATH), exec_path;
+    path_string = local_execs + ';' + path_string;
     std::stringstream ss(path_string);
     std::string directory, finaldir;
 
@@ -32,7 +33,7 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TOD
     return exec_path;
 }
 
-int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi) // TODO: Use windows CreateProcess and CreateThread to implement process forking + exec.
+int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi)
 {
     int cmd_found = EXIT_FAILURE;
     std::wstring command;
@@ -169,6 +170,6 @@ int main()
 {
 
     shell_loop(); // TODO: add modules, and to that add a basic hello executable, and add the path to that to the path string too.
-    
+
     return EXIT_SUCCESS;
 }
