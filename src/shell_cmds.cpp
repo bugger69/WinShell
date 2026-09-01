@@ -22,12 +22,12 @@ int shell_chdir(std::vector<std::string> &args) {
         const char* home = nullptr;
         if(args[1][0] == '~') {
             home = std::getenv("USERPROFILE");
-            std::string currPath(args[1]);
+            std::string currPath(new_dir);
             currPath.erase(0, 1);
             std::string finalPath = home + currPath;
             fs::current_path(finalPath);
         } else {
-            fs::current_path(args[1]);
+            fs::current_path(new_dir);
         }
     } catch (const fs::filesystem_error e) {
         std::cerr << "cd: " << e.what() << std::endl;
