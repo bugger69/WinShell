@@ -39,6 +39,7 @@ Now since we've added support for modules, cmake method stays the same but in th
 g++ -Iinclude src/main.cpp src/shell_cmds.cpp src/utils.cpp -o WinShell.exe
 cd modules
 g++ hello/main.cpp -o hello.exe
+g++ cat/main.cpp -o cat.exe
 ```
 ### Running the program
 - And no matter which way you compiled, run:
