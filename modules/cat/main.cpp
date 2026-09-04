@@ -27,7 +27,7 @@ void show_file_contents(std::vector<std::string> args) {
             }
         }
     } catch (const std::runtime_error& e) {
-        std::cout << "cat: " << e.what() << std::endl;
+        std::cerr << "cat: " << e.what() << std::endl;
     }
 }
 

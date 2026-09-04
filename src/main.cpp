@@ -15,12 +15,19 @@ void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOu
     std::vector<std::string> temp;
     
     for(int i = 1; i < args.size(); i++) {
-        if(i > 0 && (args[i - 1] == ">" || args[i - 1] == "1>") && (args[i - 1] != ">" || args[i - 1] != "1>")) {
+        if(i > 0 && (args[i - 1] == ">" || args[i - 1] == "1>") && (args[i] != ">" || args[i] != "1>")) {
             consoleOut.flag_std = SHELL_CMD_OUT_STD_FILE;
             consoleOut.file_std = args[i];
             toErase.push_back(i - 1);
             toErase.push_back(i);
         } else if (i > 0 && (args[i - 1] == ">" || args[i - 1] == "1>") && (args[i] == ">" || args[i] == "1>")) {
+            toErase.push_back(i - 1);
+        } else if(i > 0 && (args[i - 1] == "2>") && (args[i] != "2>")) {
+            consoleOut.flag_err = SHELL_CMD_OUT_ERR_FILE;
+            consoleOut.file_err = args[i];
+            toErase.push_back(i - 1);
+            toErase.push_back(i);
+        } else if (i > 0 && (args[i - 1] == "2>") && (args[i] == "2>")) {
             toErase.push_back(i - 1);
         }
     }
@@ -61,12 +68,14 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TOD
     return exec_path;
 }
 
-int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, OutputTarget &consoleOut, std::ostream* out)
+int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, OutputTarget &consoleOut, std::ostream* out, std::ostream* err)
 {
     int cmd_found = EXIT_FAILURE;
     std::wstring command;
     std::string execPath = shell_find_exec(args, cmd_found);
+    SECURITY_ATTRIBUTES sa{}; // create security attributes to enable inheritance
     HANDLE outputHandle = INVALID_HANDLE_VALUE;
+    HANDLE errHandle = INVALID_HANDLE_VALUE;
 
     if (out != &std::cout) {  // check if filestream is opn, closes it in that case
         if (auto* fileStream = dynamic_cast<std::ofstream*>(out)) {
@@ -74,10 +83,15 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         }
     }
 
+    if(err != &std::cerr) {
+        if (auto* fileStream = dynamic_cast<std::ofstream*>(err)) {
+            fileStream->close();
+        }
+    }
+
     if(cmd_found == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE) {
-        SECURITY_ATTRIBUTES sa{}; // create security attributes to enable inheritance
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
         sa.lpSecurityDescriptor = NULL;
@@ -104,6 +118,36 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
             si.dwFlags |= STARTF_USESTDHANDLES;
             si.hStdOutput = outputHandle;
             // si.hStdError = outputHandle; // TODO: Change this to error handle later
+        }
+    }
+
+    if (consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE) {
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = TRUE;
+        sa.lpSecurityDescriptor = NULL;
+        
+        std::wstring filename( // create windows string
+            consoleOut.file_err.begin(),
+            consoleOut.file_err.end()
+        );
+
+        errHandle = CreateFileW( // create file Write Handler
+            filename.c_str(),
+            GENERIC_WRITE,
+            FILE_SHARE_WRITE, // gotta figure out how this works
+            &sa,
+            CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL
+        );
+
+        if (errHandle == INVALID_HANDLE_VALUE) {
+            std::cerr << "Failed to create error file\n" << std::endl;
+            return EXIT_SUCCESS;
+        } else {
+            si.dwFlags |= STARTF_USESTDHANDLES;
+            // si.hStdOutput = outputHandle;
+            si.hStdError = errHandle;
         }
     }
 
@@ -139,6 +183,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
             std::cerr << "Error: GetExitCodeProcess failed with error code " << GetLastError() << std::endl;
         }
         CloseHandle(outputHandle); // closing output handle 
+        CloseHandle(errHandle); // closing error handle
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
     } else {
@@ -153,8 +198,9 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut) // T
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
     int status;
-    std::ofstream file;
+    std::ofstream file, errFile;
     std::ostream* out = &std::cout;
+    std::ostream* err = &std::cerr;
 
     if(args.empty()) goto end;
 
@@ -173,9 +219,19 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut) // T
         }
         out = &file;
     }
+
+    if(consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE) {
+        if(consoleOut.file_err == "") goto end;
+        errFile.open(consoleOut.file_err);
+        if (!errFile) {
+            std::cerr << "Failed to open output file" << std::endl;
+            goto end;
+        }
+        err = &errFile;
+    }
     // TODO: Write code for all shell commands, and add support for more commands later
     // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS 
-    if(shell_cmd_handler(args, out) == EXIT_FAILURE && shell_process_launch(args, si, pi, consoleOut, out) == EXIT_FAILURE) {
+    if(shell_cmd_handler(args, out, err) == EXIT_FAILURE && shell_process_launch(args, si, pi, consoleOut, out, err) == EXIT_FAILURE) {
         std::cerr << args[0] << ": command not found" << std::endl;
     }
 
