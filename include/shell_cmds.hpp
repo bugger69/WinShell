@@ -14,8 +14,10 @@
 // Output macros
 #define SHELL_CMD_OUT_STD_DEF 0
 #define SHELL_CMD_OUT_STD_FILE 1
+#define SHELL_CMD_OUT_STD_APPEND 2
 #define SHELL_CMD_OUT_ERR_DEF 0
 #define SHELL_CMD_OUT_ERR_FILE 1
+#define SHELL_CMD_OUT_ERR_APPEND 2
 
 
 class OutputTarget {

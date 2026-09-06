@@ -29,6 +29,20 @@ void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOu
             toErase.push_back(i);
         } else if (i > 0 && (args[i - 1] == "2>") && (args[i] == "2>")) {
             toErase.push_back(i - 1);
+        } else if (i > 0 && (args[i - 1] == ">>") && (args[i] != ">>")) {
+            consoleOut.flag_std = SHELL_CMD_OUT_STD_APPEND;
+            consoleOut.file_std = args[i];
+            toErase.push_back(i - 1);
+            toErase.push_back(i);
+        } else if (i > 0 && (args[i - 1] == ">>") && (args[i] != ">>")) {
+            toErase.push_back(i - 1);
+        } else if (i > 0 && (args[i - 1] == "2>>") && (args[i] != "2>>")) {
+            consoleOut.flag_std = SHELL_CMD_OUT_ERR_APPEND;
+            consoleOut.file_std = args[i];
+            toErase.push_back(i - 1);
+            toErase.push_back(i);
+        } else if (i > 0 && (args[i - 1] == "2>>") && (args[i] != "2>>")) {
+            toErase.push_back(i - 1);
         }
     }
     
@@ -210,9 +224,9 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut) // T
 
     setConsoleOutputBuf(args, consoleOut);
 
-    if(consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE) {
+    if(consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE || consoleOut.flag_std == SHELL_CMD_OUT_STD_APPEND) {
         if(consoleOut.file_std == "") goto end;
-        file.open(consoleOut.file_std);
+        consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE ? file.open(consoleOut.file_std) : file.open(consoleOut.file_std, std::ios::app);
         if (!file) {
             std::cerr << "Failed to open output file" << std::endl;
             goto end;
@@ -220,7 +234,7 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut) // T
         out = &file;
     }
 
-    if(consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE) {
+    if(consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE || consoleOut.flag_err == SHELL_CMD_OUT_ERR_APPEND) {
         if(consoleOut.file_err == "") goto end;
         errFile.open(consoleOut.file_err);
         if (!errFile) {
