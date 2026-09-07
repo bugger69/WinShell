@@ -7,6 +7,7 @@
 #include <limits>
 #include <windows.h>
 #include <algorithm>
+#include "shell_read.hpp"
 #include "parser.hpp"
 #include "shell_execute.hpp"
 #include "shell_cmds.hpp"
@@ -22,7 +23,7 @@ void shell_loop(void)
     do
     {
         std::cout << "> ";
-        std::getline(std::cin, line);
+        shell_read(line);
         shell_parse(line, args);
         status = shell_execute(args, consoleOut);
 

@@ -36,7 +36,7 @@ cmake --build .
 Now since we've added support for modules, cmake method stays the same but in this method you'll have to compile each module seperately.
 - You can execute the following:
 ```bash  
-g++ -Iinclude src/main.cpp src/shell_cmds.cpp src/utils.cpp src/parser.cpp src/shell_execute.cpp -o WinShell.exe
+g++ -Iinclude src/main.cpp src/shell_cmds.cpp src/utils.cpp src/parser.cpp src/shell_execute.cpp src/shell_read.cpp -o WinShell.exe
 cd modules
 g++ hello/main.cpp -o hello.exe
 g++ cat/main.cpp -o cat.exe

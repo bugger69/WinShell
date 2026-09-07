@@ -9,8 +9,7 @@
 #include <algorithm>
 #include "utils.hpp"
 
-void shell_parse(const std::string &line, std::vector<std::string> &args)
-{
+void shell_parse(const std::string &line, std::vector<std::string> &args) { // TODO: improve error handling
     int i = 0;
     std::string curr;
     while(i < line.size()) {
