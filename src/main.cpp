@@ -117,10 +117,10 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
 
         outputHandle = CreateFileW( // create file Write Handler
             filename.c_str(),
-            GENERIC_WRITE,
+            consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE ? GENERIC_WRITE : FILE_APPEND_DATA,
             FILE_SHARE_WRITE, // gotta figure out how this works
             &sa,
-            CREATE_ALWAYS,
+            consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE ? CREATE_ALWAYS : OPEN_ALWAYS,
             FILE_ATTRIBUTE_NORMAL,
             NULL
         );
@@ -146,10 +146,10 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
 
         errHandle = CreateFileW( // create file Write Handler
             filename.c_str(),
-            GENERIC_WRITE,
+            consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE ? GENERIC_WRITE : FILE_APPEND_DATA,
             FILE_SHARE_WRITE, // gotta figure out how this works
             &sa,
-            CREATE_ALWAYS,
+            consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE ? CREATE_ALWAYS : OPEN_ALWAYS,
             FILE_ATTRIBUTE_NORMAL,
             NULL
         );
