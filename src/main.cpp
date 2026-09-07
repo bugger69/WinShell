@@ -29,12 +29,12 @@ void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOu
             toErase.push_back(i);
         } else if (i > 0 && (args[i - 1] == "2>") && (args[i] == "2>")) {
             toErase.push_back(i - 1);
-        } else if (i > 0 && (args[i - 1] == ">>") && (args[i] != ">>")) {
+        } else if (i > 0 && (args[i - 1] == ">>" || args[i - 1] == "1>>") && (args[i] != ">>" || args[i] != "1>>")) {
             consoleOut.flag_std = SHELL_CMD_OUT_STD_APPEND;
             consoleOut.file_std = args[i];
             toErase.push_back(i - 1);
             toErase.push_back(i);
-        } else if (i > 0 && (args[i - 1] == ">>") && (args[i] == ">>")) {
+        } else if (i > 0 && (args[i - 1] == ">>" || args[i - 1] == "1>>") && (args[i] == ">>" || args[i] == "1>>")) {
             toErase.push_back(i - 1);
         } else if (i > 0 && (args[i - 1] == "2>>") && (args[i] != "2>>")) {
             consoleOut.flag_err = SHELL_CMD_OUT_ERR_APPEND;
