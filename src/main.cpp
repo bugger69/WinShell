@@ -34,14 +34,14 @@ void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOu
             consoleOut.file_std = args[i];
             toErase.push_back(i - 1);
             toErase.push_back(i);
-        } else if (i > 0 && (args[i - 1] == ">>") && (args[i] != ">>")) {
+        } else if (i > 0 && (args[i - 1] == ">>") && (args[i] == ">>")) {
             toErase.push_back(i - 1);
         } else if (i > 0 && (args[i - 1] == "2>>") && (args[i] != "2>>")) {
-            consoleOut.flag_std = SHELL_CMD_OUT_ERR_APPEND;
-            consoleOut.file_std = args[i];
+            consoleOut.flag_err = SHELL_CMD_OUT_ERR_APPEND;
+            consoleOut.file_err = args[i];
             toErase.push_back(i - 1);
             toErase.push_back(i);
-        } else if (i > 0 && (args[i - 1] == "2>>") && (args[i] != "2>>")) {
+        } else if (i > 0 && (args[i - 1] == "2>>") && (args[i] == "2>>")) {
             toErase.push_back(i - 1);
         }
     }
@@ -105,7 +105,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
 
     if(cmd_found == EXIT_FAILURE) return EXIT_FAILURE;
 
-    if (consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE) {
+    if (consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE || consoleOut.flag_std == SHELL_CMD_OUT_STD_APPEND) {
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
         sa.lpSecurityDescriptor = NULL;
@@ -131,11 +131,10 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         } else {
             si.dwFlags |= STARTF_USESTDHANDLES;
             si.hStdOutput = outputHandle;
-            // si.hStdError = outputHandle; // TODO: Change this to error handle later
         }
     }
 
-    if (consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE) {
+    if (consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE || consoleOut.flag_err == SHELL_CMD_OUT_ERR_APPEND) {
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
         sa.lpSecurityDescriptor = NULL;
@@ -236,7 +235,7 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut) // T
 
     if(consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE || consoleOut.flag_err == SHELL_CMD_OUT_ERR_APPEND) {
         if(consoleOut.file_err == "") goto end;
-        errFile.open(consoleOut.file_err);
+        consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE ? errFile.open(consoleOut.file_err) : errFile.open(consoleOut.file_err, std::ios::app);
         if (!errFile) {
             std::cerr << "Failed to open output file" << std::endl;
             goto end;
@@ -252,6 +251,8 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut) // T
 end: // TODO: Reset consoleout here
     consoleOut.flag_std = SHELL_CMD_OUT_STD_DEF;
     consoleOut.file_std = "";
+    consoleOut.flag_err = SHELL_CMD_OUT_ERR_DEF;
+    consoleOut.file_err = "";
     return EXIT_SUCCESS;
 }
 
