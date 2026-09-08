@@ -11,5 +11,8 @@
 #include "utils.hpp"
 
 void shell_read(std::string &line) {
-    std::getline(std::cin, line);
+    char ch;
+    while(std::cin.get(ch) && ch != '\n') {
+        line += ch;
+    }
 }
