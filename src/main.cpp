@@ -18,12 +18,12 @@ void shell_loop(void)
     std::string line;
     std::vector<std::string> args;
     OutputTarget consoleOut;
-    int status;
+    int status = SHELL_STATUS_NORM;
 
     do
     {
         std::cout << "> ";
-        shell_read(line);
+        shell_read(line, status);
         shell_parse(line, args);
         status = shell_execute(args, consoleOut);
 
@@ -36,7 +36,7 @@ void shell_loop(void)
 int main()
 {
 
-    shell_loop(); // TODO: fix the > and 1> operators not working errors, try replacing cout with out..
+    shell_loop(); // TODO: Add the handler for autocomplete command
 
     return EXIT_SUCCESS;
 }

@@ -5,6 +5,11 @@
 #include <vector>
 #include <map>
 
+// Shell Status
+#define SHELL_STATUS_NORM 0
+#define SHELL_STATUS_BREAK 1
+#define SHELL_STATUS_CONTINUE 2
+
 // Type Headers
 #define SHELL_CMD_TYPE_UNKNOWN -1
 #define SHELL_CMD_TYPE_BUILTIN 0
@@ -30,6 +35,7 @@ class OutputTarget {
         std::string file_err;
 };
 
+int shell_autocomp(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
 int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
 int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err);

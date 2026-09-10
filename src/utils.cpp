@@ -46,3 +46,19 @@ bool isDoubleQuoteSp(const std::string &line, int i) {
     }
     return false;
 }
+
+void prefill_input(const std::string& text) { 
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
+    if (hStdin == INVALID_HANDLE_VALUE) return; // Each character requires a 'key down' and a 'key up' event 
+    std::vector<INPUT_RECORD> events; 
+    for (char c : text) { 
+        INPUT_RECORD ir = {}; 
+        ir.EventType = KEY_EVENT; 
+        ir.Event.KeyEvent.bKeyDown = TRUE; 
+        ir.Event.KeyEvent.wRepeatCount = 1; 
+        ir.Event.KeyEvent.uChar.AsciiChar = c; 
+        events.push_back(ir); 
+    } 
+    DWORD written; 
+    WriteConsoleInput(hStdin, events.data(), events.size(), &written); 
+}

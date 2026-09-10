@@ -7,6 +7,7 @@
 #include "utils.hpp"
 
 std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream* err)> shell_cmds = {
+    {"autocomp", shell_autocomp},
     {"cd", shell_chdir},
     {"echo", shell_echo},
     {"exit", shell_exit},
@@ -14,6 +15,15 @@ std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ost
     {"pwd", shell_pwd},
     {"help", shell_help}
 };
+
+int shell_autocomp(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+    if(args[1] == "exi") {
+        *out << "exit" << std::endl;
+    } else if (args[1] == "ech") {
+        *out << "echo" << std::endl;
+    }
+    return EXIT_SUCCESS;
+}
 
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
     std::string new_dir(args[1]);

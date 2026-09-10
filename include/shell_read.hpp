@@ -8,7 +8,10 @@
 #include <cstdlib>
 #include <limits>
 #include <windows.h>
+#include <conio.h>
 #include <algorithm>
 #include "utils.hpp"
 
-void shell_read(std::string &line);
+void handle_autocomplete(std::string &line);
+
+void shell_read(std::string &line, int &status);

@@ -22,3 +22,6 @@ bool endsWith(const std::string& mainStr, const std::string& suffix);
 bool isEscape(const std::string &line, int i);
 bool isCurrEscape(const std::string &line, int i);
 bool isDoubleQuoteSp(const std::string &line, int i);
+
+/* Input Autocomplete helpers */
+void prefill_input(const std::string& text);
