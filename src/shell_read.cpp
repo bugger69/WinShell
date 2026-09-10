@@ -51,6 +51,13 @@ void shell_read(std::string &line, int &status) {
                     inputBuffer.pop_back();
                     std::cout<< "\b \b" << std::flush;
                 }
+            } else if (vk == VK_TAB) {
+                int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
+                for (int i = 0; i < spacesToAdd; ++i) {
+                    inputBuffer.push_back(' ');
+                    std::cout << ' ';
+                }
+                std::cout << std::flush;
             } else if (vk == VK_RETURN) {
                 line = inputBuffer;
                 std::cout << std::endl;
