@@ -53,3 +53,16 @@ bool isDoubleQuoteSp(const std::string &line, int i) {
     }
     return false;
 }
+
+bool startsWith(const std::string& mainStr, const std::string& prefix) {
+    if(prefix.size() > mainStr.size()) return false;
+    return mainStr.find(prefix) == 0;
+}
+
+std::string remove_start(const std::string &cmd, std::string& prefix) {
+    if(startsWith(cmd, prefix)) {
+        std::string str(cmd.begin() + prefix.size(), cmd.end());
+        return str;
+    }
+    return "";
+}

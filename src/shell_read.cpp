@@ -14,16 +14,24 @@
 constexpr int TAB_SIZE = 4;
 
 void handle_autocomplete(std::string &cmd) {
-    if(cmd == "exi") {
-        cmd.push_back('t');
+    std::vector<std::string> allCmds;
+    for(auto it : shell_cmds) {
+        if(startsWith(it.first, cmd)) {
+            allCmds.push_back(it.first);
+        }
+    }
+    if(allCmds.size() == 0) {
+        std::cout << '\x07';
+    } else if (allCmds.size() == 1) {
+        std::string str = remove_start(allCmds[0], cmd);
+        for(auto it : str) {
+            cmd.push_back(it);
+            std::cout << it;
+        }
         cmd.push_back(' ');
-        std::cout << 't';
         std::cout << ' ';
-    } else if (cmd == "ech") {
-        cmd.push_back('o');
-        cmd.push_back(' ');
-        std::cout << 'o';
-        std::cout << ' ';
+    } else {
+        // print all commands
     }
 }
 
