@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "utils.hpp"
 
+void findCommands(std::vector<std::string>& cmdList, std::string& prefix);
 void handle_autocomplete(std::string &cmd);
 
 void shell_read(std::string &line, int &status);

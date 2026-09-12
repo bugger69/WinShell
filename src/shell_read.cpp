@@ -13,13 +13,17 @@
 
 constexpr int TAB_SIZE = 4;
 
-void handle_autocomplete(std::string &cmd) {
-    std::vector<std::string> allCmds;
+void findCommands(std::vector<std::string>& cmdList, std::string& prefix) {
     for(auto it : shell_cmds) {
-        if(startsWith(it.first, cmd)) {
-            allCmds.push_back(it.first);
+        if(startsWith(it.first, prefix)) {
+            cmdList.push_back(it.first);
         }
     }
+}
+
+void handle_autocomplete(std::string &cmd) {
+    std::vector<std::string> allCmds;
+    findCommands(allCmds, cmd);
     if(allCmds.size() == 0) {
         std::cout << '\x07';
     } else if (allCmds.size() == 1) {
