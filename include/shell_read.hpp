@@ -12,6 +12,6 @@
 #include <algorithm>
 #include "utils.hpp"
 
-void handle_autocomplete(std::string &line);
+void handle_autocomplete(std::string &cmd);
 
 void shell_read(std::string &line, int &status);

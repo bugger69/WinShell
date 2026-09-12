@@ -13,11 +13,17 @@
 
 constexpr int TAB_SIZE = 4;
 
-void handle_autocomplete(std::string &line) {
-    if(line == "exi") {
-        prefill_input("exit");
-    } else if (line == "ech") {
-        prefill_input("echo");
+void handle_autocomplete(std::string &cmd) {
+    if(cmd == "exi") {
+        cmd.push_back('t');
+        cmd.push_back(' ');
+        std::cout << 't';
+        std::cout << ' ';
+    } else if (cmd == "ech") {
+        cmd.push_back('o');
+        cmd.push_back(' ');
+        std::cout << 'o';
+        std::cout << ' ';
     }
 }
 
@@ -52,10 +58,14 @@ void shell_read(std::string &line, int &status) {
                     std::cout<< "\b \b" << std::flush;
                 }
             } else if (vk == VK_TAB) {
-                int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
-                for (int i = 0; i < spacesToAdd; ++i) {
-                    inputBuffer.push_back(' ');
-                    std::cout << ' ';
+                if (!has_space(inputBuffer)) {
+                    handle_autocomplete(inputBuffer);
+                } else {
+                    int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
+                    for (int i = 0; i < spacesToAdd; ++i) {
+                        inputBuffer.push_back(' ');
+                        std::cout << ' ';
+                    }
                 }
                 std::cout << std::flush;
             } else if (vk == VK_RETURN) {

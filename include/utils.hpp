@@ -13,6 +13,9 @@ namespace fs = std::filesystem;
 #define DOUBLEQUOTESPCHARS {'"', '\\'}
 #define EXEC_PERMISSIONS (fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec)
 
+/* General Helpers */
+bool has_space(const std::string& cmd);
+
 /* Path helpers */
 bool execute_permission(const fs::path exec_path);
 const char* find_path_var();
@@ -24,4 +27,3 @@ bool isCurrEscape(const std::string &line, int i);
 bool isDoubleQuoteSp(const std::string &line, int i);
 
 /* Input Autocomplete helpers */
-void prefill_input(const std::string& text);

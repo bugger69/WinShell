@@ -7,6 +7,13 @@
 #include <windows.h>
 #include "utils.hpp"
 
+bool has_space(const std::string& cmd) {
+    for(auto it : cmd) {
+        if(it == ' ') return true;
+    }
+    return false;
+}
+
 bool endsWith(const std::string& mainStr, const std::string& suffix) {
     if (mainStr.length() < suffix.length()) return false;
     return mainStr.rfind(suffix) == (mainStr.length() - suffix.length());
@@ -45,20 +52,4 @@ bool isDoubleQuoteSp(const std::string &line, int i) {
         }
     }
     return false;
-}
-
-void prefill_input(const std::string& text) { 
-    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE); 
-    if (hStdin == INVALID_HANDLE_VALUE) return; // Each character requires a 'key down' and a 'key up' event 
-    std::vector<INPUT_RECORD> events; 
-    for (char c : text) { 
-        INPUT_RECORD ir = {}; 
-        ir.EventType = KEY_EVENT; 
-        ir.Event.KeyEvent.bKeyDown = TRUE; 
-        ir.Event.KeyEvent.wRepeatCount = 1; 
-        ir.Event.KeyEvent.uChar.AsciiChar = c; 
-        events.push_back(ir); 
-    } 
-    DWORD written; 
-    WriteConsoleInput(hStdin, events.data(), events.size(), &written); 
 }
