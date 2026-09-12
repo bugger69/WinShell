@@ -31,7 +31,14 @@ void handle_autocomplete(std::string &cmd) {
         cmd.push_back(' ');
         std::cout << ' ';
     } else {
-        // print all commands
+        std::cout << "\n";
+        for(auto it : allCmds) {
+            std::cout << it;
+            std::cout << '\n';
+        }
+        std::cout << '>';
+        std::cout << ' ';
+        std::cout << cmd;
     }
 }
 
