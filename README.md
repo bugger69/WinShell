@@ -2,7 +2,7 @@
 
 ## Features
 This is supposed to be a basic shell designed for windows. I will keep adding more commands/features to it from time to time.
-For now it features the following shell commands : cd, echo, exit, type, pwd, help and is capable of finding executables from path variable in type and executing them when called. Plus I've added basic file/error buffer redirections and autocomplete for shell commands.
+For now it features the following shell commands : cd, echo, exit, type, pwd, help and is capable of finding executables from path variable in type and executing them when called. Plus I've added basic file/error buffer redirections and autocomplete for shell commands and executables.
 
 ## How to set up and build
 You can build via two ways (I just added cmake just in case the project becomes complicated in the future.)
