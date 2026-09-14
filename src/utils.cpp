@@ -66,3 +66,11 @@ std::string remove_start(const std::string &cmd, std::string& prefix) {
     }
     return "";
 }
+
+std::string remove_end(const std::string &cmd, std::string& suffix) {
+    if(endsWith(cmd, suffix)) {
+        std::string str(cmd.begin(), cmd.end() - suffix.size());
+        return str;
+    }
+    return "";
+}
