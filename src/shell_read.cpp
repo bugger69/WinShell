@@ -13,6 +13,15 @@
 
 constexpr int TAB_SIZE = 4;
 
+std::string longestCommonPrefix(std::vector<std::string>& cmdList, std::string& cmd) {
+    std::string longestPrefix = cmdList[0]; // TODO: change this to find longest common prefix from cmdList
+    std::size_t size = cmdList.size();
+    for(int i = 0; i < size - 1; i++) {
+        longestPrefix = common_prefix(longestPrefix, cmdList[i + 1]);
+    }
+    return longestPrefix;
+}
+
 void findCommands(std::vector<std::string>& cmdList, std::string& prefix) {
     const char* path_env = find_path_var();
     std::string path_string(path_env), local_execs(EXEC_BIN_PATH), exec_path;
@@ -58,14 +67,34 @@ void handle_autocomplete(std::string &cmd) {
         cmd.push_back(' ');
         std::cout << ' ';
     } else {
-        std::cout << "\n"; // TODO: When you add executables, make these into groups of 3 printed in one line and so on.
-        for(auto it : allCmds) {
-            std::cout << it;
+        std::string curr = longestCommonPrefix(allCmds, cmd);
+        std::string diff = remove_start(curr, cmd);
+        std::size_t columnWidth = 0;
+        int i = 1;
+        std::cout << '\n';
+        for (const auto& command : allCmds) {
+            columnWidth = (std::max)(columnWidth, command.size());
+        }
+
+        columnWidth += 4; // spacing between columns
+
+        for (std::size_t i = 0; i < allCmds.size(); ++i) {
+            std::cout << std::left << std::setw(static_cast<int>(columnWidth))
+                    << allCmds[i];
+
+            if ((i + 1) % 3 == 0) {
+                std::cout << '\n';
+            }
+        }
+
+        if (allCmds.size() % 3 != 0) {
             std::cout << '\n';
         }
         std::cout << '>';
         std::cout << ' ';
-        std::cout << cmd;
+        std::cout << curr;
+        cmd += diff;
+        i = 0;
     }
 }
 

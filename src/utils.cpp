@@ -74,3 +74,19 @@ std::string remove_end(const std::string &cmd, std::string& suffix) {
     }
     return "";
 }
+
+std::string common_prefix(const std::string &str1, const std::string &str2) {
+    std::size_t k = 0;
+    std::string ans;
+    if(str1.size() > str2.size()) {
+        k = str2.size();
+    } else {
+        k = str1.size();
+    }
+    for(int i = 0; i < k; i++) {
+        if(str1[i] == str2[i]) {
+            ans += str1[i];
+        } else break;
+    }
+    return ans;
+}

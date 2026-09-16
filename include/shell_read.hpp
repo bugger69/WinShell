@@ -12,6 +12,7 @@
 #include <algorithm>
 #include "utils.hpp"
 
+std::string longestCommonPrefix(std::vector<std::string>& cmdList, std::string& cmd);
 void findCommands(std::vector<std::string>& cmdList, std::string& prefix);
 void handle_autocomplete(std::string &cmd);
 
