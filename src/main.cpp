@@ -12,6 +12,7 @@
 #include "shell_execute.hpp"
 #include "shell_cmds.hpp"
 #include "utils.hpp"
+#include "Trie.hpp"
 
 void shell_loop(void)
 {
