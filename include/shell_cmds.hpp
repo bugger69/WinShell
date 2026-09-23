@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include "shell_context.hpp"
 
 // Shell Status
 #define SHELL_STATUS_NORM 0

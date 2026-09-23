@@ -7,6 +7,7 @@
 #include <limits>
 #include <windows.h>
 #include <algorithm>
+#include "shell_context.hpp"
 #include "parser.hpp"
 #include "shell_execute.hpp"
 #include "shell_cmds.hpp"
@@ -59,7 +60,7 @@ void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOu
     }
 }
 
-std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TODO: Add support for full file paths
+std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TODO: Add support for full file paths and executables other than .exe(s)
     std::string exec = !endsWith(args[0], ".exe") ? args[0] + ".exe" : args[0];
     const char* path_env = find_path_var();
     std::string path_string(path_env), local_execs(EXEC_BIN_PATH), exec_path;
@@ -208,7 +209,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
     return EXIT_SUCCESS;
 }
 
-int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut) // TODO: add basic commands
+int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, ShellContext &context) // TODO: add basic commands
 {
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;

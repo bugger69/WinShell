@@ -10,10 +10,10 @@
 #include <windows.h>
 #include <conio.h>
 #include <algorithm>
+#include "shell_context.hpp"
 #include "utils.hpp"
 
 std::string longestCommonPrefix(std::vector<std::string>& cmdList, std::string& cmd);
-void findCommands(std::vector<std::string>& cmdList, std::string& prefix);
-void handle_autocomplete(std::string &cmd);
+void handle_autocomplete(std::string &cmd, ShellContext &context);
 
-void shell_read(std::string &line, int &status);
+void shell_read(std::string &line, int &status, ShellContext &context);

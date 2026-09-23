@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -7,7 +9,9 @@
 #include <limits>
 #include <windows.h>
 #include <algorithm>
-#include "shell_context.hpp"
-#include "utils.hpp"
+#include "Trie.hpp"
 
-void shell_parse(const std::string &line, std::vector<std::string> &args, ShellContext &context);
+struct ShellContext {
+public:
+    Trie* path;
+};

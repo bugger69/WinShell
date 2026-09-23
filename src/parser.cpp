@@ -8,8 +8,9 @@
 #include <windows.h>
 #include <algorithm>
 #include "utils.hpp"
+#include "shell_context.hpp"
 
-void shell_parse(const std::string &line, std::vector<std::string> &args) { // TODO: improve error handling
+void shell_parse(const std::string &line, std::vector<std::string> &args, ShellContext &context) { // TODO: improve error handling
     int i = 0;
     std::string curr;
     while(i < line.size()) {

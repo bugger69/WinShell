@@ -13,4 +13,4 @@
 void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOut);
 std::string shell_find_exec(std::vector<std::string> &args, int &found);
 int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, OutputTarget &consoleOut, std::ostream* out, std::ostream* err);
-int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut);
+int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, ShellContext &context);

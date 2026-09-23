@@ -26,7 +26,7 @@ bool TrieNode :: incrementPrefixCount() {
     return true;
 }
 
-bool TrieNode :: decrementPrefixCount() {
+bool TrieNode :: decrementPrefixCount() { // TODO: add code to run destructor when it reaches 0
     this->prefixCount -= 1;
     return true;
 }
@@ -40,7 +40,7 @@ bool TrieNode :: incrementWordCount() {
     return true;
 }
 
-bool TrieNode :: decrementWordCount() {
+bool TrieNode :: decrementWordCount() { // TODO: add code to run destructor when it reaches 0
     this->wordCount -= 1;
     return true;
 }

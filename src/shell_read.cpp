@@ -7,6 +7,7 @@
 #include <limits>
 #include <windows.h>
 #include <algorithm>
+#include "shell_context.hpp"
 #include "shell_cmds.hpp"
 #include "shell_read.hpp"
 #include "utils.hpp"
@@ -22,40 +23,8 @@ std::string longestCommonPrefix(std::vector<std::string>& cmdList, std::string& 
     return longestPrefix;
 }
 
-void findCommands(std::vector<std::string>& cmdList, std::string& prefix) {
-    const char* path_env = find_path_var();
-    std::string path_string(path_env), local_execs(EXEC_BIN_PATH), exec_path;
-    path_string = local_execs + ';' + path_string;
-    std::stringstream ss(path_string);
-    std::string directory, execSuffix = ".exe";
-
-    for(auto it : shell_cmds) {
-        if(startsWith(it.first, prefix)) {
-            cmdList.push_back(it.first);
-        }
-    }
-
-    while(std::getline(ss, directory, ';')) {
-        fs::path target_path(directory);
-        if(fs::exists(target_path) && fs::is_directory(target_path)) {
-            for(const auto& entry : fs::directory_iterator(target_path)) {
-                if(fs::is_regular_file(entry) && execute_permission(entry.path())) {
-                    std::string filename = entry.path().filename().string();
-                    if(endsWith(filename, execSuffix) && startsWith(filename, prefix)) {
-                        filename = remove_end(filename, execSuffix);
-                        cmdList.push_back(filename);
-                    }
-                }
-            }
-        }
-    }
-
-    sort(cmdList.begin(), cmdList.end());
-}
-
-void handle_autocomplete(std::string &cmd) {
-    std::vector<std::string> allCmds;
-    findCommands(allCmds, cmd);
+void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: This is much faster, but change it's logic to optimise further
+    std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
     if(allCmds.size() == 0) {
         std::cout << '\x07';
     } else if (allCmds.size() == 1) {
@@ -100,7 +69,7 @@ void handle_autocomplete(std::string &cmd) {
 
 
 
-void shell_read(std::string &line, int &status) {
+void shell_read(std::string &line, int &status, ShellContext &context) {
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -130,7 +99,7 @@ void shell_read(std::string &line, int &status) {
                 }
             } else if (vk == VK_TAB) {
                 if (!has_space(inputBuffer)) {
-                    handle_autocomplete(inputBuffer);
+                    handle_autocomplete(inputBuffer, context);
                 } else {
                     int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
                     for (int i = 0; i < spacesToAdd; ++i) {
