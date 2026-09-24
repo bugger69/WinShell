@@ -160,11 +160,12 @@ std::string Trie :: extendPrefix(std::string prefix) {
         curr = next;
         i++;
     }
-    int origPrefix = curr->getPrefixCount();
+    
     while(curr->getChildren().size() == 1) {
         std::vector<char> child = curr->getChildren();
         TrieNode* next = curr->getChildNode(child[0]);
         extPrefix += next->getSymbol();
+        curr = next;
     }
     return extPrefix;
 }

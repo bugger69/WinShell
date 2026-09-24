@@ -14,21 +14,13 @@
 
 constexpr int TAB_SIZE = 4;
 
-std::string longestCommonPrefix(std::vector<std::string>& cmdList, std::string& cmd) {
-    std::string longestPrefix = cmdList[0]; // TODO: change this to find longest common prefix from cmdList
-    std::size_t size = cmdList.size();
-    for(int i = 0; i < size - 1; i++) {
-        longestPrefix = common_prefix(longestPrefix, cmdList[i + 1]);
-    }
-    return longestPrefix;
-}
-
-void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: This is much faster, but change it's logic to optimise further
+void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: optimise further when you add in shell commands
     std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
     if(allCmds.size() == 0) {
         std::cout << '\x07';
     } else if (allCmds.size() == 1) {
-        std::string str = remove_start(allCmds[0], cmd);
+        std::string extCmd = context.path->extendPrefix(cmd);
+        std::string str = remove_start(extCmd, cmd);
         for(auto it : str) {
             cmd.push_back(it);
             std::cout << it;
@@ -36,10 +28,9 @@ void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: Thi
         cmd.push_back(' ');
         std::cout << ' ';
     } else {
-        std::string curr = longestCommonPrefix(allCmds, cmd);
+        std::string curr = context.path->extendPrefix(cmd);
         std::string diff = remove_start(curr, cmd);
         std::size_t columnWidth = 0;
-        int i = 1;
         std::cout << '\n';
         for (const auto& command : allCmds) {
             columnWidth = (std::max)(columnWidth, command.size());
@@ -63,7 +54,6 @@ void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: Thi
         std::cout << ' ';
         std::cout << curr;
         cmd += diff;
-        i = 0;
     }
 }
 
@@ -97,7 +87,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
                     inputBuffer.pop_back();
                     std::cout<< "\b \b" << std::flush;
                 }
-            } else if (vk == VK_TAB) {
+            } else if (vk == VK_TAB) { // TODO: Add support for two tabs
                 if (!has_space(inputBuffer)) {
                     handle_autocomplete(inputBuffer, context);
                 } else {
