@@ -14,13 +14,13 @@
 
 constexpr int TAB_SIZE = 4;
 
-void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: optimise further when you add in shell commands
+void handle_autocomplete(std::string &cmd, ShellContext &context, bool &waitingForSecondTab) { // TODO: optimise further when you add in shell commands
     std::string extCmd = context.path->extendPrefix(cmd);
-    if(extCmd == cmd && !(context.path->search(extCmd))) {
+    if(extCmd == cmd && !(context.path->search(extCmd))) { // TODO: Add support for if a command is a substring of another command (one more else if)
         std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
         if(allCmds.size() == 0) {
             std::cout << '\x07';
-        } else {
+        } else if (waitingForSecondTab) {
             std::string diff = remove_start(extCmd, cmd);
             std::size_t columnWidth = 0;
             std::cout << '\n';
@@ -46,6 +46,8 @@ void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: opt
             std::cout << ' ';
             std::cout << extCmd;
             cmd += diff;
+        } else {
+            waitingForSecondTab = !waitingForSecondTab;
         }
     } else {
         std::string str = remove_start(extCmd, cmd);
@@ -55,6 +57,7 @@ void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: opt
         }
         cmd.push_back(' ');
         std::cout << ' ';
+        waitingForSecondTab = false;
     }
 }
 
@@ -72,6 +75,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
     std::string inputBuffer;
     INPUT_RECORD ir;
     DWORD read;
+    bool waitingForSecondTab = false;
 
     while(true) {
         ReadConsoleInput(hIn, &ir, 1, &read);
@@ -83,6 +87,8 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
 
             if(vk == VK_ESCAPE) break;
 
+            if(vk != VK_TAB) waitingForSecondTab = false;
+
             if(vk == VK_BACK) {
                 if(!inputBuffer.empty()) {
                     inputBuffer.pop_back();
@@ -90,13 +96,15 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
                 }
             } else if (vk == VK_TAB) { // TODO: Add support for two tabs
                 if (!has_space(inputBuffer)) {
-                    handle_autocomplete(inputBuffer, context);
-                } else {
+                    handle_autocomplete(inputBuffer, context, waitingForSecondTab);
+                } else if (!waitingForSecondTab) {
                     int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
                     for (int i = 0; i < spacesToAdd; ++i) {
                         inputBuffer.push_back(' ');
                         std::cout << ' ';
                     }
+                } else {
+                    waitingForSecondTab = false;
                 }
                 std::cout << std::flush;
             } else if (vk == VK_RETURN) {
