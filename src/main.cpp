@@ -22,6 +22,15 @@ ShellContext shell_init() {
     std::stringstream ss(path_string);
     std::string directory, finaldir;
     context.path = new Trie();
+    context.shellCmds = new Trie();
+
+    /* Initializing Shell Commands */
+    for(auto it : shell_cmds) {
+        context.shellCmds->insert(it.first, it.first);
+        context.path->insert(it.first, "shell-command");
+    }
+
+    /* Initializing path */
     while(std::getline(ss, directory, ';')) {
         fs::path target_path(directory);
         if(fs::exists(target_path) && fs::is_directory(target_path)) {

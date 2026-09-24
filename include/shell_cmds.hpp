@@ -36,7 +36,6 @@ class OutputTarget {
         std::string file_err;
 };
 
-int shell_autocomp(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
 int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
 int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err);

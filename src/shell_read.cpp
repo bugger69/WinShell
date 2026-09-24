@@ -15,11 +15,39 @@
 constexpr int TAB_SIZE = 4;
 
 void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: optimise further when you add in shell commands
-    std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
-    if(allCmds.size() == 0) {
-        std::cout << '\x07';
-    } else if (allCmds.size() == 1) {
-        std::string extCmd = context.path->extendPrefix(cmd);
+    std::string extCmd = context.path->extendPrefix(cmd);
+    if(extCmd == cmd && !(context.path->search(extCmd))) {
+        std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
+        if(allCmds.size() == 0) {
+            std::cout << '\x07';
+        } else {
+            std::string diff = remove_start(extCmd, cmd);
+            std::size_t columnWidth = 0;
+            std::cout << '\n';
+            for (const auto& command : allCmds) {
+                columnWidth = (std::max)(columnWidth, command.size());
+            }
+
+            columnWidth += 4; // spacing between columns
+
+            for (std::size_t i = 0; i < allCmds.size(); ++i) {
+                std::cout << std::left << std::setw(static_cast<int>(columnWidth))
+                        << allCmds[i];
+
+                if ((i + 1) % 3 == 0) {
+                    std::cout << '\n';
+                }
+            }
+
+            if (allCmds.size() % 3 != 0) {
+                std::cout << '\n';
+            }
+            std::cout << '>';
+            std::cout << ' ';
+            std::cout << extCmd;
+            cmd += diff;
+        }
+    } else {
         std::string str = remove_start(extCmd, cmd);
         for(auto it : str) {
             cmd.push_back(it);
@@ -27,33 +55,6 @@ void handle_autocomplete(std::string &cmd, ShellContext &context) { // TODO: opt
         }
         cmd.push_back(' ');
         std::cout << ' ';
-    } else {
-        std::string curr = context.path->extendPrefix(cmd);
-        std::string diff = remove_start(curr, cmd);
-        std::size_t columnWidth = 0;
-        std::cout << '\n';
-        for (const auto& command : allCmds) {
-            columnWidth = (std::max)(columnWidth, command.size());
-        }
-
-        columnWidth += 4; // spacing between columns
-
-        for (std::size_t i = 0; i < allCmds.size(); ++i) {
-            std::cout << std::left << std::setw(static_cast<int>(columnWidth))
-                    << allCmds[i];
-
-            if ((i + 1) % 3 == 0) {
-                std::cout << '\n';
-            }
-        }
-
-        if (allCmds.size() % 3 != 0) {
-            std::cout << '\n';
-        }
-        std::cout << '>';
-        std::cout << ' ';
-        std::cout << curr;
-        cmd += diff;
     }
 }
 

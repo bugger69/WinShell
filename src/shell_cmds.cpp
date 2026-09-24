@@ -7,7 +7,6 @@
 #include "utils.hpp"
 
 std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream* err)> shell_cmds = {
-    {"autocomp", shell_autocomp},
     {"cd", shell_chdir},
     {"echo", shell_echo},
     {"exit", shell_exit},
@@ -16,14 +15,6 @@ std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ost
     {"help", shell_help}
 };
 
-int shell_autocomp(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
-    if(args[1] == "exi") {
-        *out << "exit" << std::endl;
-    } else if (args[1] == "ech") {
-        *out << "echo" << std::endl;
-    }
-    return EXIT_SUCCESS;
-}
 
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
     std::string new_dir(args[1]);
@@ -118,10 +109,9 @@ int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 
 int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
     if (args.empty()) return EXIT_FAILURE;
-    for(auto it : shell_cmds) {
-        if(args[0] == it.first) {
-            return it.second(args, out, err);
-        }
-    }
+
+    if(!(shell_cmds.find(args[0]) == shell_cmds.end())) // TODO: replace this line with trie search?
+        return shell_cmds[args[0]](args, out, err);
+
     return EXIT_FAILURE;
 }
