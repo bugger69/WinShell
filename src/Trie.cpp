@@ -182,7 +182,7 @@ std::vector<std::string> Trie :: allCmdsFromPrefix(std::string prefix) {
         curr = next;
         i++;
     }
-    
+    if(curr->isEndOfWord()) allCmd.push_back(prefix);
     s.push({curr, prefix});
     while(!s.empty()) {
         curr = s.top().first;

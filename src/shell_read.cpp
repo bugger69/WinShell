@@ -14,13 +14,13 @@
 
 constexpr int TAB_SIZE = 4;
 
-void handle_autocomplete(std::string &cmd, ShellContext &context, bool &waitingForSecondTab) { // TODO: optimise further when you add in shell commands
+void handle_autocomplete(std::string &cmd, ShellContext &context, bool &waitingForSecondTab) {
     std::string extCmd = context.path->extendPrefix(cmd);
-    if(extCmd == cmd && !(context.path->search(extCmd))) { // TODO: Add support for if a command is a substring of another command (one more else if)
-        std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
-        if(allCmds.size() == 0) {
+    std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
+    if((extCmd == cmd && !(context.path->search(extCmd))) || (allCmds.size() > 1)) {
+        if(allCmds.size() == 0 && !waitingForSecondTab) {
             std::cout << '\x07';
-        } else if (waitingForSecondTab) {
+        } else if (waitingForSecondTab || (context.path->search(extCmd) && allCmds.size() > 1)) {
             std::string diff = remove_start(extCmd, cmd);
             std::size_t columnWidth = 0;
             std::cout << '\n';
@@ -46,9 +46,8 @@ void handle_autocomplete(std::string &cmd, ShellContext &context, bool &waitingF
             std::cout << ' ';
             std::cout << extCmd;
             cmd += diff;
-        } else {
-            waitingForSecondTab = !waitingForSecondTab;
-        }
+        } 
+        waitingForSecondTab = !waitingForSecondTab;
     } else {
         std::string str = remove_start(extCmd, cmd);
         for(auto it : str) {
