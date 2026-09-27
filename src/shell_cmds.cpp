@@ -69,31 +69,25 @@ int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* e
 
 int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) { // TODO: Use context to address this too
     int cmdType = SHELL_CMD_TYPE_UNKNOWN;
-    const char* path_env = find_path_var();
-    std::string path_string(path_env);
-    std::stringstream ss(path_env);
+    bool isCommand = context.path->search(args[1]);
     std::string directory, finaldir;
-
-    for (auto it : shell_cmds) {
-        if(args[1] == it.first) {
-            cmdType = SHELL_CMD_TYPE_BUILTIN; // Built-in command
-            break;
-        }
-    }
-    if(cmdType == SHELL_CMD_TYPE_UNKNOWN) {
-        std::string exec = args[1] + ".exe";
-        while(std::getline(ss, directory, ';')) {
-            fs::path target_path(directory);
-            if(fs::exists(target_path) && fs::is_directory(target_path)) {
-                for(const auto& entry : fs::directory_iterator(target_path)) {
-                    if(fs::is_regular_file(entry) && entry.path().filename() == exec && execute_permission(entry.path())) {
-                        cmdType = SHELL_CMD_TYPE_EXEC; // Executable
-                        finaldir = directory;
-                    }
-                }
+    if(isCommand) {
+        std::vector<std::string> exec = context.path->getExec(args[1]);
+        if(exec[0] == "shell-command") {
+            cmdType = SHELL_CMD_TYPE_BUILTIN;
+        } else {
+            cmdType = SHELL_CMD_TYPE_EXEC;
+            directory = exec[0];
+            std::string exe;
+            for(int i = directory.size() - 1; i >= 0; i--) {
+                if(directory[i] == '/' || directory[i] == '\\') break;
+                exe += directory[i];
             }
+            reverse(exe.begin(), exe.end());
+            finaldir = remove_end(directory, exe);
         }
     }
+    
     switch(cmdType) {
         case SHELL_CMD_TYPE_BUILTIN:
             *out << args[1] << " is a shell builtin." << std::endl;

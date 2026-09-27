@@ -64,7 +64,7 @@ std::string remove_start(const std::string &cmd, std::string& prefix) {
         std::string str(cmd.begin() + prefix.size(), cmd.end());
         return str;
     }
-    return "";
+    return cmd;
 }
 
 std::string remove_end(const std::string &cmd, std::string& suffix) {
@@ -72,7 +72,7 @@ std::string remove_end(const std::string &cmd, std::string& suffix) {
         std::string str(cmd.begin(), cmd.end() - suffix.size());
         return str;
     }
-    return "";
+    return cmd;
 }
 
 std::string common_prefix(const std::string &str1, const std::string &str2) {
