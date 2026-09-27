@@ -14,7 +14,7 @@
 
 constexpr int TAB_SIZE = 4;
 
-void handle_autocomplete(std::string &cmd, ShellContext &context, bool &waitingForSecondTab) {
+void handleAutocompeteCmd(std::string &cmd, ShellContext &context, bool &waitingForSecondTab) {
     std::string extCmd = context.path->extendPrefix(cmd);
     std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
     if((extCmd == cmd && !(context.path->search(extCmd))) || (allCmds.size() > 1)) {
@@ -95,7 +95,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
                 }
             } else if (vk == VK_TAB) { // TODO: Add support for two tabs
                 if (!has_space(inputBuffer)) {
-                    handle_autocomplete(inputBuffer, context, waitingForSecondTab);
+                    handleAutocompeteCmd(inputBuffer, context, waitingForSecondTab);
                 } else if (!waitingForSecondTab) {
                     int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
                     for (int i = 0; i < spacesToAdd; ++i) {

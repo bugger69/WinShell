@@ -36,12 +36,12 @@ class OutputTarget {
         std::string file_err;
 };
 
-int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
-int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
-int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
-int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
-int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
-int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
-int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err);
+int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 
-extern std::map<std::string, int(*)(std::vector<std::string>&, std::ostream*, std::ostream* err)> shell_cmds;
+extern std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream*, ShellContext &)> shell_cmds;

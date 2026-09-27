@@ -85,7 +85,7 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TOD
     return exec_path;
 }
 
-int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, OutputTarget &consoleOut, std::ostream* out, std::ostream* err)
+int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, OutputTarget &consoleOut, std::ostream* out, std::ostream* err, ShellContext &context)
 {
     int cmd_found = EXIT_FAILURE;
     std::wstring command;
@@ -247,7 +247,7 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, Shel
     }
     // TODO: Write code for all shell commands, and add support for more commands later
     // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS 
-    if(shell_cmd_handler(args, out, err) == EXIT_FAILURE && shell_process_launch(args, si, pi, consoleOut, out, err) == EXIT_FAILURE) {
+    if(shell_cmd_handler(args, out, err, context) == EXIT_FAILURE && shell_process_launch(args, si, pi, consoleOut, out, err, context) == EXIT_FAILURE) {
         std::cerr << args[0] << ": command not found" << std::endl;
     }
 

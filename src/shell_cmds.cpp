@@ -6,7 +6,7 @@
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
-std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream* err)> shell_cmds = {
+std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream*, ShellContext &)> shell_cmds = {
     {"cd", shell_chdir},
     {"echo", shell_echo},
     {"exit", shell_exit},
@@ -16,7 +16,7 @@ std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ost
 };
 
 
-int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     std::string new_dir(args[1]);
 
     try {
@@ -36,7 +36,7 @@ int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream*
     return EXIT_SUCCESS;
 }
 
-int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     for(int i = 1; i < args.size(); i++) {
         *out << args[i] << " ";
     }
@@ -44,12 +44,12 @@ int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* 
     return EXIT_SUCCESS;
 }
 
-int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     *out << "Exiting WinShell..." << std::endl;
     exit(EXIT_SUCCESS);
 }
 
-int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     *out << "WinShell Help: " << std::endl;
     *out << "Write program names and arguments, and hit enter" << std::endl;
     *out << "The following commands are available by default:" << std::endl;
@@ -60,14 +60,14 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
     return EXIT_SUCCESS;
 }
 
-int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     fs::path curr_dir = fs::current_path();
     std::string currPath = curr_dir.string();
     *out << currPath << std::endl;
     return EXIT_SUCCESS;
 }
 
-int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) { // TODO: Use context to address this too
     int cmdType = SHELL_CMD_TYPE_UNKNOWN;
     const char* path_env = find_path_var();
     std::string path_string(path_env);
@@ -107,11 +107,11 @@ int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* 
     return EXIT_SUCCESS;
 }
 
-int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err) {
+int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     if (args.empty()) return EXIT_FAILURE;
 
     if(!(shell_cmds.find(args[0]) == shell_cmds.end())) // TODO: replace this line with trie search?
-        return shell_cmds[args[0]](args, out, err);
+        return shell_cmds[args[0]](args, out, err, context);
 
     return EXIT_FAILURE;
 }
