@@ -60,27 +60,17 @@ void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOu
     }
 }
 
-std::string shell_find_exec(std::vector<std::string> &args, int &found) { // TODO: Add support for full file paths and executables other than .exe(s)
-    std::string exec = !endsWith(args[0], ".exe") ? args[0] + ".exe" : args[0];
-    const char* path_env = find_path_var();
-    std::string path_string(path_env), local_execs(EXEC_BIN_PATH), exec_path;
-    path_string = local_execs + ';' + path_string;
-    std::stringstream ss(path_string);
-    std::string directory, finaldir;
-
-    while(std::getline(ss, directory, ';')) {
-        fs::path target_path(directory);
-        if(fs::exists(target_path) && fs::is_directory(target_path)) {
-            for(const auto& entry : fs::directory_iterator(target_path)) {
-                if(fs::is_regular_file(entry) && entry.path().filename() == exec && execute_permission(entry.path())) {
-                    finaldir = directory;
-                    found = EXIT_SUCCESS;
-                }
-            }
-        }
+std::string shell_find_exec(std::vector<std::string> &args, int &found, ShellContext &context) { // TODO: Add support for full file paths and executables other than .exe(s)
+    std::string suff = ".exe";
+    std::string exe = remove_end(args[0], suff);
+    std::string exec_path;
+    bool isFound = context.path->search(exe);
+    if(isFound) {
+        found = EXIT_SUCCESS;
+        std::vector<std::string> execs = context.path->getExec(exe);
+        exec_path = execs[0]; // TODO: Fig out something for multiple execs
+        std::cout << exec_path << std::endl;
     }
-
-    if(finaldir.size()) exec_path = finaldir + '/' + exec;
 
     return exec_path;
 }
@@ -89,7 +79,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
 {
     int cmd_found = EXIT_FAILURE;
     std::wstring command;
-    std::string execPath = shell_find_exec(args, cmd_found);
+    std::string execPath = shell_find_exec(args, cmd_found, context);
     SECURITY_ATTRIBUTES sa{}; // create security attributes to enable inheritance
     HANDLE outputHandle = INVALID_HANDLE_VALUE;
     HANDLE errHandle = INVALID_HANDLE_VALUE;

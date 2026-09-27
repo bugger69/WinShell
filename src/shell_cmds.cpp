@@ -67,7 +67,7 @@ int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* e
     return EXIT_SUCCESS;
 }
 
-int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) { // TODO: Use context to address this too
+int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     int cmdType = SHELL_CMD_TYPE_UNKNOWN;
     bool isCommand = context.path->search(args[1]);
     std::string directory, finaldir;
@@ -87,7 +87,7 @@ int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* 
             finaldir = remove_end(directory, exe);
         }
     }
-    
+
     switch(cmdType) {
         case SHELL_CMD_TYPE_BUILTIN:
             *out << args[1] << " is a shell builtin." << std::endl;
