@@ -33,7 +33,7 @@ public:
     std::vector<char> getChildren();
     TrieNode* getChildNode(char c);
     int insertExec(std::string exec);
-    std::vector<std::string> getExecs();
+    std::vector<std::string> getInfos();
 };
 
 class Trie {
@@ -43,8 +43,9 @@ private:
 public:
     Trie();
     ~Trie();
+    void clear();
     bool search(std::string word);
-    std::vector<std::string> getExec(std::string word);
+    std::vector<std::string> getInfo(std::string word);
     bool insert(std::string word, std::string exec);
     std::string extendPrefix(std::string prefix);
     std::vector<std::string> allCmdsFromPrefix(std::string prefix);

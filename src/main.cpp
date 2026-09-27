@@ -16,17 +16,20 @@
 
 ShellContext shell_init() {
     ShellContext context;
+    fs::path curr_dir = fs::current_path();
     const char* path_env = find_path_var();
     std::string path_string(path_env), local_execs(EXEC_BIN_PATH), exec_path;
     path_string = local_execs + ';' + path_string;
     std::stringstream ss(path_string);
     std::string directory, finaldir;
     context.path = new Trie();
-    context.shellCmds = new Trie();
+    context.CurrDir = new Trie();
+
+    /* Populating current directory */
+    populate_dir(context.CurrDir, curr_dir);
 
     /* Initializing Shell Commands */
     for(auto it : shell_cmds) {
-        context.shellCmds->insert(it.first, it.first);
         context.path->insert(it.first, "shell-command");
     }
 
@@ -72,7 +75,6 @@ int main()
 {
     ShellContext context = shell_init();
 
-    shell_loop(context); // TODO: Add the handler for autocomplete command
-
+    shell_loop(context);
     return EXIT_SUCCESS;
 }

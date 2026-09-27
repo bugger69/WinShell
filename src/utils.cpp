@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <windows.h>
+#include "Trie.hpp"
 #include "utils.hpp"
 
 bool has_space(const std::string& cmd) {
@@ -89,4 +90,21 @@ std::string common_prefix(const std::string &str1, const std::string &str2) {
         } else break;
     }
     return ans;
+}
+
+int populate_dir(Trie* curr, fs::path &cwd) {
+    curr->clear();
+    if(fs::is_directory(cwd)) {
+        for(const auto& entry : fs::directory_iterator(cwd)) {
+            std::string currpath = entry.path().string();
+            if(fs::is_directory(currpath)) {
+                std::string dir = entry.path().filename().string();
+                curr->insert(dir, "directory");
+            } else if(fs::is_regular_file(currpath)) {
+                std::string file = entry.path().filename().string();
+                curr->insert(file, "file");
+            }
+        }
+    }
+    return 0;
 }

@@ -96,14 +96,19 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
             } else if (vk == VK_TAB) { // TODO: Add support for two tabs
                 if (!has_space(inputBuffer)) {
                     handleAutocompeteCmd(inputBuffer, context, waitingForSecondTab);
-                } else if (!waitingForSecondTab) {
-                    int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
-                    for (int i = 0; i < spacesToAdd; ++i) {
-                        inputBuffer.push_back(' ');
-                        std::cout << ' ';
-                    }
                 } else {
-                    waitingForSecondTab = false;
+                    std::istringstream iss(inputBuffer);
+                    // std::vector<std::string> words((std::istream_iterator<std::string>(iss)),
+                    //                 std::istream_iterator<std::string>());
+                    if (!waitingForSecondTab) {
+                        int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
+                        for (int i = 0; i < spacesToAdd; ++i) {
+                            inputBuffer.push_back(' ');
+                            std::cout << ' ';
+                        }
+                    } else {
+                        waitingForSecondTab = false;
+                    }
                 }
                 std::cout << std::flush;
             } else if (vk == VK_RETURN) {

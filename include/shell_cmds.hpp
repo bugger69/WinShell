@@ -40,6 +40,7 @@ int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream*
 int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_listdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);

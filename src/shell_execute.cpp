@@ -67,7 +67,7 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found, ShellCon
     bool isFound = context.path->search(exe);
     if(isFound) {
         found = EXIT_SUCCESS;
-        std::vector<std::string> execs = context.path->getExec(exe);
+        std::vector<std::string> execs = context.path->getInfo(exe);
         exec_path = execs[0]; // TODO: Fig out something for multiple execs
         std::cout << exec_path << std::endl;
     }

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <filesystem>
 #include <string>
@@ -5,6 +7,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <windows.h>
+#include "Trie.hpp"
 
 namespace fs = std::filesystem;
 
@@ -15,6 +18,7 @@ namespace fs = std::filesystem;
 
 /* General Helpers */
 bool has_space(const std::string& cmd);
+int populate_dir(Trie* curr, fs::path &cwd);
 
 /* Path helpers */
 bool execute_permission(const fs::path exec_path);

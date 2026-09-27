@@ -10,6 +10,7 @@ std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ost
     {"cd", shell_chdir},
     {"echo", shell_echo},
     {"exit", shell_exit},
+    {"ls", shell_listdir},
     {"type", shell_type},
     {"pwd", shell_pwd},
     {"help", shell_help}
@@ -26,9 +27,13 @@ int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream*
             std::string currPath(new_dir);
             currPath.erase(0, 1);
             std::string finalPath = home + currPath;
-            fs::current_path(finalPath);
+            fs::path dir(finalPath);
+            populate_dir(context.CurrDir, dir);
+            fs::current_path(dir);
         } else {
-            fs::current_path(new_dir);
+            fs::path dir(new_dir);
+            populate_dir(context.CurrDir, dir);
+            fs::current_path(dir);
         }
     } catch (const fs::filesystem_error e) {
         *err << "cd: " << e.what() << std::endl;
@@ -60,6 +65,23 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
     return EXIT_SUCCESS;
 }
 
+int shell_listdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
+    fs::path curr_dir = fs::current_path();
+    if(fs::is_directory(curr_dir)) {
+        for(const auto& entry : fs::directory_iterator(curr_dir)) {
+            std::string currpath = entry.path().string();
+            if(fs::is_directory(currpath)) {
+                std::string dir = entry.path().filename().string();
+                *out << dir << "\\" << std::endl;
+            } else if(fs::is_regular_file(currpath)) {
+                std::string file = entry.path().filename().string();
+                *out << file << std::endl;
+            }
+        }
+    }
+    return EXIT_SUCCESS;
+}
+
 int shell_pwd(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     fs::path curr_dir = fs::current_path();
     std::string currPath = curr_dir.string();
@@ -72,7 +94,7 @@ int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* 
     bool isCommand = context.path->search(args[1]);
     std::string directory, finaldir;
     if(isCommand) {
-        std::vector<std::string> exec = context.path->getExec(args[1]);
+        std::vector<std::string> exec = context.path->getInfo(args[1]);
         if(exec[0] == "shell-command") {
             cmdType = SHELL_CMD_TYPE_BUILTIN;
         } else {

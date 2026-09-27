@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <stack>
 #include <utility>
+#include <algorithm>
 #include "Trie.hpp"
 
 /* TrieNode functions */
@@ -87,7 +88,7 @@ int TrieNode :: insertExec(std::string exec) {
     return TRIE_STATUS_SUCCESS;
 }
 
-std::vector<std::string> TrieNode :: getExecs() {
+std::vector<std::string> TrieNode :: getInfos() {
     return this->executables;
 }
 
@@ -103,6 +104,12 @@ Trie :: ~Trie() {
     delete head;
 }
 
+void Trie :: clear() {
+    TrieNode* nhead = new TrieNode('*', false);
+    delete head;
+    head = nhead;
+}
+
 bool Trie :: search(std::string word) {
     int i = 0;
     TrieNode* curr = this->head;
@@ -114,7 +121,7 @@ bool Trie :: search(std::string word) {
     return !word.empty() && curr->isEndOfWord();
 }
 
-std::vector<std::string> Trie :: getExec(std::string word) {
+std::vector<std::string> Trie :: getInfo(std::string word) {
     std::vector<std::string> empty;
     int i = 0;
     TrieNode* curr = this->head;
@@ -123,7 +130,7 @@ std::vector<std::string> Trie :: getExec(std::string word) {
         if(curr == nullptr) return empty;
         i++;
     }
-    return !word.empty() && curr->isEndOfWord() ? curr->getExecs() : empty;
+    return !word.empty() && curr->isEndOfWord() ? curr->getInfos() : empty;
 }
 
 bool Trie :: insert(std::string word, std::string exec) {
@@ -161,7 +168,7 @@ std::string Trie :: extendPrefix(std::string prefix) {
         i++;
     }
     
-    while(curr->getChildren().size() == 1) {
+    while(curr->getChildren().size() == 1 && !curr->isEndOfWord()) {
         std::vector<char> child = curr->getChildren();
         TrieNode* next = curr->getChildNode(child[0]);
         extPrefix += next->getSymbol();
@@ -189,7 +196,7 @@ std::vector<std::string> Trie :: allCmdsFromPrefix(std::string prefix) {
         std::string command = s.top().second;
 
         s.pop();
-        if (curr->isEndOfWord()) {
+        if (curr->isEndOfWord() && std::find(allCmd.begin(), allCmd.end(), command) == allCmd.end()) {
             allCmd.push_back(command);
         }
 
