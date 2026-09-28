@@ -24,9 +24,18 @@ ShellContext shell_init() {
     std::string directory, finaldir;
     context.path = new Trie();
     context.CurrDir = new Trie();
+    context.newDir = new Trie();
+    context.tabSM = new Tabsm();
 
     /* Populating current directory */
     populate_dir(context.CurrDir, curr_dir);
+
+    /* Populating new directory trie */
+    populate_dir(context.newDir, curr_dir);
+
+    /* Intitializing Tab state machine */
+    context.tabSM->curr = TAB_AUTOCOMP_CMD;
+    context.tabSM->count = 0;
 
     /* Initializing Shell Commands */
     for(auto it : shell_cmds) {

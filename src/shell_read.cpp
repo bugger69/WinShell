@@ -14,13 +14,13 @@
 
 constexpr int TAB_SIZE = 4;
 
-void handleAutocompeteCmd(std::string &cmd, ShellContext &context, bool &waitingForSecondTab) {
+void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
     std::string extCmd = context.path->extendPrefix(cmd);
     std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
     if((extCmd == cmd && !(context.path->search(extCmd))) || (allCmds.size() > 1)) {
-        if(allCmds.size() == 0 && !waitingForSecondTab) {
+        if(allCmds.size() == 0 && context.tabSM->count == 0) {
             std::cout << '\x07';
-        } else if (waitingForSecondTab || (context.path->search(extCmd) && allCmds.size() > 1)) {
+        } else if (context.tabSM->count > 0 && (allCmds.size() > 1 || context.path->search(extCmd))) { // TODO: Check the logic here
             std::string diff = remove_start(extCmd, cmd);
             std::size_t columnWidth = 0;
             std::cout << '\n';
@@ -46,8 +46,7 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context, bool &waiting
             std::cout << ' ';
             std::cout << extCmd;
             cmd += diff;
-        } 
-        waitingForSecondTab = !waitingForSecondTab;
+        }
     } else {
         std::string str = remove_start(extCmd, cmd);
         for(auto it : str) {
@@ -56,13 +55,60 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context, bool &waiting
         }
         cmd.push_back(' ');
         std::cout << ' ';
-        waitingForSecondTab = false;
     }
 }
 
+void handleAutocompetePath(std::vector<std::string> &args, ShellContext &context) { // TODO: change this to be a return type function, and use that to update inputbuffer in a seperate function 
+    std::string extArg = context.newDir->extendPrefix(args[args.size() - 1]);
+    std::vector<std::string> allCmds = context.newDir->allCmdsFromPrefix(args[args.size() - 1]);
+    if((extArg == args[args.size() - 1] && !(context.newDir->search(extArg))) || (allCmds.size() > 1)) {
+        if(allCmds.size() == 0 && context.tabSM->count == 0) {
+            std::cout << '\x07';
+        } else if (context.tabSM->count > 0 && (allCmds.size() > 1 || context.newDir->search(extArg))) {
+            std::string diff = remove_start(extArg, args[args.size() - 1]);
+            std::size_t columnWidth = 0;
+            std::cout << '\n';
+            for (const auto& command : allCmds) {
+                columnWidth = (std::max)(columnWidth, command.size());
+            }
 
+            columnWidth += 4; // spacing between columns
 
-void shell_read(std::string &line, int &status, ShellContext &context) {
+            for (std::size_t i = 0; i < allCmds.size(); ++i) {
+                std::cout << std::left << std::setw(static_cast<int>(columnWidth))
+                        << allCmds[i];
+
+                if ((i + 1) % 3 == 0) {
+                    std::cout << '\n';
+                }
+            }
+
+            if (allCmds.size() % 3 != 0) {
+                std::cout << '\n';
+            }
+            std::cout << '\n';
+            std::cout << '>';
+            std::cout << ' ';
+            for(int i = 0; i < args.size() - 1; i++) {
+                std::cout << args[i];
+                std::cout << ' ';
+            }
+            std::cout << extArg;
+            // args[args.size() - 1] += diff;
+            args.push_back(diff);
+        }
+    } else {
+        std::string str = remove_start(extArg, args[args.size() - 1]);
+        for(auto it : str) {
+            args[args.size() - 1].push_back(it);
+            std::cout << it;
+        }
+        args[args.size() - 1].push_back(' ');
+        args.push_back(str);
+    }
+}
+
+void shell_read(std::string &line, int &status, ShellContext &context) { // TODO: polish waiting for second tab logic
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -79,6 +125,14 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
     while(true) {
         ReadConsoleInput(hIn, &ir, 1, &read);
 
+        if (!has_space(inputBuffer)) {
+            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_CMD;
+            else context.tabSM->curr = TAB_AUTOCOMP_NONE;
+        } else {
+            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_ARG;
+            else context.tabSM->curr = TAB_AUTOCOMP_NONE;
+        }
+
         if(ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
             auto &ke = ir.Event.KeyEvent;
             WORD vk = ke.wVirtualKeyCode;
@@ -86,7 +140,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
 
             if(vk == VK_ESCAPE) break;
 
-            if(vk != VK_TAB) waitingForSecondTab = false;
+            if(vk != VK_TAB) context.tabSM->count = 0;
 
             if(vk == VK_BACK) {
                 if(!inputBuffer.empty()) {
@@ -94,22 +148,30 @@ void shell_read(std::string &line, int &status, ShellContext &context) {
                     std::cout<< "\b \b" << std::flush;
                 }
             } else if (vk == VK_TAB) { // TODO: Add support for two tabs
-                if (!has_space(inputBuffer)) {
-                    handleAutocompeteCmd(inputBuffer, context, waitingForSecondTab);
-                } else {
+                if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
+                    handleAutocompeteCmd(inputBuffer, context);
+                } else if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
                     std::istringstream iss(inputBuffer);
-                    // std::vector<std::string> words((std::istream_iterator<std::string>(iss)),
-                    //                 std::istream_iterator<std::string>());
-                    if (!waitingForSecondTab) {
-                        int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
-                        for (int i = 0; i < spacesToAdd; ++i) {
-                            inputBuffer.push_back(' ');
-                            std::cout << ' ';
+                    std::vector<std::string> args;
+                    std::string last;
+                    int storedSize = args.size();
+                    while(iss >> last) {
+                        args.push_back(last);
+                    }
+                    handleAutocompetePath(args, context);
+                    if(args.size() > storedSize) {
+                        for(auto it : args[args.size() - 1]) {
+                            inputBuffer.push_back(it);
                         }
-                    } else {
-                        waitingForSecondTab = false;
+                    }
+                } else {
+                    int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
+                    for (int i = 0; i < spacesToAdd; ++i) {
+                        inputBuffer.push_back(' ');
+                        std::cout << ' ';
                     }
                 }
+                context.tabSM->count++;
                 std::cout << std::flush;
             } else if (vk == VK_RETURN) {
                 line = inputBuffer;

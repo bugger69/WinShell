@@ -13,6 +13,7 @@
 #include "shell_context.hpp"
 #include "utils.hpp"
 
-void handleAutocompeteCmd(std::string &cmd, ShellContext &context, bool &waitingForSecondTab);
+void handleAutocompetePath(std::string &arg, ShellContext &context);
+void handleAutocompeteCmd(std::string &cmd, ShellContext &context);
 
 void shell_read(std::string &line, int &status, ShellContext &context);
