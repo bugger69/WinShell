@@ -58,14 +58,21 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
     }
 }
 
-void handleAutocompetePath(std::vector<std::string> &args, ShellContext &context) { // TODO: change this to be a return type function, and use that to update inputbuffer in a seperate function 
-    std::string extArg = context.newDir->extendPrefix(args[args.size() - 1]);
-    std::vector<std::string> allCmds = context.newDir->allCmdsFromPrefix(args[args.size() - 1]);
-    if((extArg == args[args.size() - 1] && !(context.newDir->search(extArg))) || (allCmds.size() > 1)) {
+void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TODO: change this to be a return type function, and use that to update inputbuffer in a seperate function 
+    std::istringstream iss(cmdFull);
+    std::vector<std::string> args;
+    std::string last;
+    while(iss >> last) {
+        args.push_back(last);
+    }
+    std::string cmd = last;
+    std::string extCmd = context.newDir->extendPrefix(cmd);
+    std::vector<std::string> allCmds = context.newDir->allCmdsFromPrefix(cmd);
+    if((extCmd == cmd && !(context.newDir->search(extCmd))) || (allCmds.size() > 1)) {
         if(allCmds.size() == 0 && context.tabSM->count == 0) {
             std::cout << '\x07';
-        } else if (context.tabSM->count > 0 && (allCmds.size() > 1 || context.newDir->search(extArg))) {
-            std::string diff = remove_start(extArg, args[args.size() - 1]);
+        } else if (context.tabSM->count > 0 && (allCmds.size() > 1 || context.newDir->search(extCmd))) { // TODO: Check the logic here
+            std::string diff = remove_start(extCmd, cmd);
             std::size_t columnWidth = 0;
             std::cout << '\n';
             for (const auto& command : allCmds) {
@@ -86,25 +93,17 @@ void handleAutocompetePath(std::vector<std::string> &args, ShellContext &context
             if (allCmds.size() % 3 != 0) {
                 std::cout << '\n';
             }
-            std::cout << '\n';
             std::cout << '>';
             std::cout << ' ';
-            for(int i = 0; i < args.size() - 1; i++) {
-                std::cout << args[i];
-                std::cout << ' ';
-            }
-            std::cout << extArg;
-            // args[args.size() - 1] += diff;
-            args.push_back(diff);
+            cmdFull += diff;
+            std::cout << cmdFull;
         }
     } else {
-        std::string str = remove_start(extArg, args[args.size() - 1]);
+        std::string str = remove_start(extCmd, cmd);
         for(auto it : str) {
-            args[args.size() - 1].push_back(it);
+            cmdFull.push_back(it);
             std::cout << it;
         }
-        args[args.size() - 1].push_back(' ');
-        args.push_back(str);
     }
 }
 
@@ -129,7 +128,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_CMD;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         } else {
-            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_ARG;
+            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_PATH;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         }
 
@@ -150,20 +149,8 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             } else if (vk == VK_TAB) { // TODO: Add support for two tabs
                 if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
                     handleAutocompeteCmd(inputBuffer, context);
-                } else if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
-                    std::istringstream iss(inputBuffer);
-                    std::vector<std::string> args;
-                    std::string last;
-                    int storedSize = args.size();
-                    while(iss >> last) {
-                        args.push_back(last);
-                    }
-                    handleAutocompetePath(args, context);
-                    if(args.size() > storedSize) {
-                        for(auto it : args[args.size() - 1]) {
-                            inputBuffer.push_back(it);
-                        }
-                    }
+                } else if (context.tabSM->curr == TAB_AUTOCOMP_PATH) {
+                    handleAutocompetePath(inputBuffer, context);
                 } else {
                     int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
                     for (int i = 0; i < spacesToAdd; ++i) {

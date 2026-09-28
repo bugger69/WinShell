@@ -14,8 +14,8 @@
 /* Tab SM macros*/
 #define TAB_AUTOCOMP_NONE 0
 #define TAB_AUTOCOMP_CMD 1
-#define TAB_AUTOCOMP_ARG 2
-#define TAB_AUTOCOMP_COMP 3
+#define TAB_AUTOCOMP_PATH 2
+#define TAB_AUTOCOMP_ARG 3
 
 /* Tab state machine */
 struct Tabsm {
