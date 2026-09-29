@@ -29,12 +29,14 @@ int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream*
             std::string finalPath = home + currPath;
             fs::path dir(finalPath);
             populate_dir(context.CurrDir, dir);
-            populate_dir(context.newDir, dir);
+            context.newDir->clear();
+            context.newDir = new Trie(*context.CurrDir);
             fs::current_path(dir);
         } else {
             fs::path dir(new_dir);
             populate_dir(context.CurrDir, dir);
-            populate_dir(context.newDir, dir);
+            context.newDir->clear();
+            context.newDir = new Trie(*context.CurrDir);
             fs::current_path(dir);
         }
     } catch (const fs::filesystem_error e) {

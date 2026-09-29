@@ -100,6 +100,16 @@ Trie :: Trie() {
     this->head = node;
 }
 
+Trie :: Trie(const Trie& other) : head(new TrieNode(*other.head)) {}
+
+Trie& Trie :: operator=(const Trie& other) {
+    if (this != &other) {
+        TrieNode* copiedHead = new TrieNode(*other.head);
+        delete this->head;
+        this->head = copiedHead;
+    }
+}
+
 Trie :: ~Trie() {
     delete head;
 }

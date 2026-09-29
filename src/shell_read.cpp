@@ -97,7 +97,8 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
             std::cout << ' ';
             cmdFull += diff;
             std::cout << cmdFull;
-            if(context.tabSM->count == 2 && context.newDir->getInfo(extCmd)[0] == "directory") {
+            std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
+            if(context.tabSM->count == 2 && !currArgs.empty() && currArgs[0] == "directory") {
                 cmdFull += '\\';
                 std::cout << '\\';
             } 
@@ -108,8 +109,11 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
             cmdFull.push_back(it);
             std::cout << it;
         }
-        cmdFull.push_back('\\');
-        std::cout << '\\';
+        std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
+        if(!currArgs.empty() && currArgs[0] == "directory") {
+            cmdFull.push_back('\\');
+            std::cout << '\\';
+        }
     }
 }
 
@@ -130,7 +134,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
     while(true) {
         ReadConsoleInput(hIn, &ir, 1, &read);
 
-        if (!has_space(inputBuffer)) {
+        if (!has_space(inputBuffer)) { // TODO: Create seperate function for this
             if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_CMD;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         } else {
@@ -143,9 +147,14 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             WORD vk = ke.wVirtualKeyCode;
             char ch = ke.uChar.AsciiChar;
 
-            if(vk == VK_ESCAPE) break;
-
             if(vk != VK_TAB) context.tabSM->count = 0;
+
+            if(vk == VK_ESCAPE) {
+                std::cout << '\n';
+                context.newDir->clear();
+                context.newDir = new Trie(*context.CurrDir);
+                break;
+            }
 
             if(vk == VK_BACK) {
                 if(!inputBuffer.empty()) {

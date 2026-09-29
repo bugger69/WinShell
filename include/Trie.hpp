@@ -42,6 +42,8 @@ private:
 
 public:
     Trie();
+    Trie(const Trie& other);
+    Trie& operator=(const Trie& other);
     ~Trie();
     void clear();
     bool search(std::string word);

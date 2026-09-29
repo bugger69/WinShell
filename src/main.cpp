@@ -31,7 +31,7 @@ ShellContext shell_init() {
     populate_dir(context.CurrDir, curr_dir);
 
     /* Populating new directory trie */
-    populate_dir(context.newDir, curr_dir);
+    context.newDir = new Trie(*context.CurrDir);
 
     /* Intitializing Tab state machine */
     context.tabSM->curr = TAB_AUTOCOMP_CMD;
