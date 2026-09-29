@@ -29,10 +29,12 @@ int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream*
             std::string finalPath = home + currPath;
             fs::path dir(finalPath);
             populate_dir(context.CurrDir, dir);
+            populate_dir(context.newDir, dir);
             fs::current_path(dir);
         } else {
             fs::path dir(new_dir);
             populate_dir(context.CurrDir, dir);
+            populate_dir(context.newDir, dir);
             fs::current_path(dir);
         }
     } catch (const fs::filesystem_error e) {
@@ -67,18 +69,32 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 
 int shell_listdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     fs::path curr_dir = fs::current_path();
-    if(fs::is_directory(curr_dir)) {
-        for(const auto& entry : fs::directory_iterator(curr_dir)) {
-            std::string currpath = entry.path().string();
-            if(fs::is_directory(currpath)) {
-                std::string dir = entry.path().filename().string();
-                *out << dir << "\\" << std::endl;
-            } else if(fs::is_regular_file(currpath)) {
-                std::string file = entry.path().filename().string();
-                *out << file << std::endl;
-            }
+    if (fs::is_directory(curr_dir)) {
+
+    std::vector<std::string> entries;
+
+    for (const auto& entry : fs::directory_iterator(curr_dir)) {
+        if (fs::is_directory(entry.path())) {
+            entries.push_back(entry.path().filename().string() + "\\");
+        }
+        else if (fs::is_regular_file(entry.path())) {
+            entries.push_back(entry.path().filename().string());
         }
     }
+
+    const int columnWidth = 30;
+
+    for (size_t i = 0; i < entries.size(); ++i) {
+        *out << std::left << std::setw(columnWidth) << entries[i];
+
+        if ((i + 1) % 3 == 0)
+            *out << '\n';
+    }
+
+    // Newline if the last row wasn't complete
+    if (entries.size() % 3 != 0)
+        *out << '\n';
+}
     return EXIT_SUCCESS;
 }
 
