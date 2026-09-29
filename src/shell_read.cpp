@@ -97,6 +97,10 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
             std::cout << ' ';
             cmdFull += diff;
             std::cout << cmdFull;
+            if(context.tabSM->count == 2 && context.newDir->getInfo(extCmd)[0] == "directory") {
+                cmdFull += '\\';
+                std::cout << '\\';
+            } 
         }
     } else {
         std::string str = remove_start(extCmd, cmd);
@@ -104,6 +108,8 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
             cmdFull.push_back(it);
             std::cout << it;
         }
+        cmdFull.push_back('\\');
+        std::cout << '\\';
     }
 }
 
