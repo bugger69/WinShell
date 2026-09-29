@@ -36,6 +36,7 @@ ShellContext shell_init() {
     /* Intitializing Tab state machine */
     context.tabSM->curr = TAB_AUTOCOMP_CMD;
     context.tabSM->count = 0;
+    context.tabSM->pathsPossible = true;
 
     /* Initializing Shell Commands */
     for(auto it : shell_cmds) {

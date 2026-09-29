@@ -14,6 +14,30 @@ TrieNode :: TrieNode(char c, bool val, int c1, int c2) {
     this->wordCount = c2;
 }
 
+TrieNode :: TrieNode(const TrieNode& other)
+    : symbol(other.symbol),
+      isWordEnd(other.isWordEnd),
+      prefixCount(other.prefixCount),
+      wordCount(other.wordCount),
+      executables(other.executables) {
+    try {
+        for (const auto& entry : other.children) {
+            TrieNode* childCopy = new TrieNode(*entry.second);
+            try {
+                children.emplace(entry.first, childCopy);
+            } catch (...) {
+                delete childCopy;
+                throw;
+            }
+        }
+    } catch (...) {
+        for (const auto& entry : children) {
+            delete entry.second;
+        }
+        throw;
+    }
+}
+
 TrieNode :: ~TrieNode() {
     for(auto it : this->children) delete it.second;
 }
@@ -105,9 +129,10 @@ Trie :: Trie(const Trie& other) : head(new TrieNode(*other.head)) {}
 Trie& Trie :: operator=(const Trie& other) {
     if (this != &other) {
         TrieNode* copiedHead = new TrieNode(*other.head);
-        delete this->head;
+        delete head;
         this->head = copiedHead;
     }
+    return *this;
 }
 
 Trie :: ~Trie() {

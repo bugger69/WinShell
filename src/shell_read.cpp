@@ -60,12 +60,22 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
 
 void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TODO: change this to be a return type function, and use that to update inputbuffer in a seperate function 
     std::istringstream iss(cmdFull);
-    std::vector<std::string> args;
-    std::string last;
+    std::vector<std::string> args, parts;
+    std::string last, part;
     while(iss >> last) {
         args.push_back(last);
     }
-    std::string cmd = last;
+
+    for(auto it : last) {
+        if(it == '\\') {
+            parts.push_back(part);
+            part = "";
+            continue;
+        }
+        part += it;
+    }
+    
+    std::string cmd = part;
     std::string extCmd = context.newDir->extendPrefix(cmd);
     std::vector<std::string> allCmds = context.newDir->allCmdsFromPrefix(cmd);
     if((extCmd == cmd && !(context.newDir->search(extCmd))) || (allCmds.size() > 1)) {
@@ -99,7 +109,10 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
             std::cout << cmdFull;
             std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
             if(context.tabSM->count == 2 && !currArgs.empty() && currArgs[0] == "directory") {
+                context.newDir->clear();
                 cmdFull += '\\';
+                fs::path npth(cmdFull);
+                populate_dir(context.newDir, npth);
                 std::cout << '\\';
             } 
         }
@@ -111,7 +124,10 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
         }
         std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
         if(!currArgs.empty() && currArgs[0] == "directory") {
-            cmdFull.push_back('\\');
+            context.newDir->clear();
+            cmdFull += '\\';
+            fs::path npth(cmdFull);
+            populate_dir(context.newDir, npth);
             std::cout << '\\';
         }
     }
@@ -138,7 +154,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_CMD;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         } else {
-            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_PATH;
+            if(context.tabSM->count < 3 || context.tabSM->pathsPossible) context.tabSM->curr = TAB_AUTOCOMP_PATH;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         }
 
@@ -147,12 +163,16 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             WORD vk = ke.wVirtualKeyCode;
             char ch = ke.uChar.AsciiChar;
 
-            if(vk != VK_TAB) context.tabSM->count = 0;
+            if(vk != VK_TAB) {
+                if(context.tabSM->count > 0) {
+                    context.newDir->clear();
+                    context.newDir = new Trie(*context.CurrDir);
+                }
+                context.tabSM->count = 0;
+            }
 
             if(vk == VK_ESCAPE) {
                 std::cout << '\n';
-                context.newDir->clear();
-                context.newDir = new Trie(*context.CurrDir);
                 break;
             }
 

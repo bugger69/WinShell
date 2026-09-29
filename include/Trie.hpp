@@ -19,6 +19,8 @@ private:
 
 public:
     TrieNode(char c, bool val, int c1 = 0, int c2 = 0);
+    TrieNode(const TrieNode& other);
+    TrieNode& operator=(const TrieNode& other) = delete;
     ~TrieNode();
     char getSymbol();
     bool incrementPrefixCount();

@@ -22,6 +22,7 @@ struct Tabsm {
 public:
     int curr;
     int count;
+    bool pathsPossible;
 };
 
 struct ShellContext {
