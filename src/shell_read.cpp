@@ -58,7 +58,7 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
     }
 }
 
-void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TODO: change this to be a return type function, and use that to update inputbuffer in a seperate function 
+void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
     std::istringstream iss(cmdFull);
     std::vector<std::string> args, parts;
     std::string last, part;
@@ -67,12 +67,20 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
     }
 
     for(auto it : last) {
+        part += it;
         if(it == '\\') {
             parts.push_back(part);
             part = "";
             continue;
         }
-        part += it;
+    }
+
+    if(part[part.size() - 1] == '\\' ) {// TODO: FIGURE OUT CORRECT CONDITION FOR THIS ONE, 
+        fs::path cwd = fs::current_path();  // TODO: UPDATE NEW-DIR TRIE HERE, BASED ON THE LAST ARGUMENT
+        fs::path lst(last);
+        fs::path newpth = cwd / lst;
+        // std::cout << " " << newpth << " " << std::endl;
+        populate_dir(context.newDir, newpth);
     }
     
     std::string cmd = part;
@@ -109,11 +117,8 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
             std::cout << cmdFull;
             std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
             if(context.tabSM->count == 2 && !currArgs.empty() && currArgs[0] == "directory") {
-                context.newDir->clear();
                 cmdFull += '\\';
-                fs::path npth(cmdFull);
-                populate_dir(context.newDir, npth);
-                std::cout << '\\';
+                std::cout << '/';
             } 
         }
     } else {
@@ -124,11 +129,8 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) { // TOD
         }
         std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
         if(!currArgs.empty() && currArgs[0] == "directory") {
-            context.newDir->clear();
             cmdFull += '\\';
-            fs::path npth(cmdFull);
-            populate_dir(context.newDir, npth);
-            std::cout << '\\';
+            std::cout << '/';
         }
     }
 }
@@ -164,14 +166,14 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             char ch = ke.uChar.AsciiChar;
 
             if(vk != VK_TAB) {
-                if(context.tabSM->count > 0) {
-                    context.newDir->clear();
-                    context.newDir = new Trie(*context.CurrDir);
-                }
                 context.tabSM->count = 0;
             }
 
             if(vk == VK_ESCAPE) {
+                if(context.tabSM->count > 0) {
+                    context.newDir->clear();
+                    context.newDir = new Trie(*context.CurrDir);
+                }
                 std::cout << '\n';
                 break;
             }
@@ -196,6 +198,10 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                 context.tabSM->count++;
                 std::cout << std::flush;
             } else if (vk == VK_RETURN) {
+                if(context.tabSM->count > 0) {
+                    context.newDir->clear();
+                    context.newDir = new Trie(*context.CurrDir);
+                }
                 line = inputBuffer;
                 std::cout << std::endl;
                 inputBuffer.clear();
