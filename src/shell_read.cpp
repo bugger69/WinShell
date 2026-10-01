@@ -60,28 +60,25 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
 
 void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
     std::istringstream iss(cmdFull);
-    std::vector<std::string> args, parts;
-    std::string last, part;
+    std::vector<std::string> args;
+    std::string last, part, parts;
     while(iss >> last) {
         args.push_back(last);
     }
 
     for(auto it : last) {
         part += it;
-        if(it == '\\') {
-            parts.push_back(part);
+        if(it == '/') {
+            parts = parts.length() > 0 ? parts + '/' + part : parts + part;
             part = "";
             continue;
         }
     }
 
-    if(part[part.size() - 1] == '\\' ) {// TODO: FIGURE OUT CORRECT CONDITION FOR THIS ONE, 
-        fs::path cwd = fs::current_path();  // TODO: UPDATE NEW-DIR TRIE HERE, BASED ON THE LAST ARGUMENT
-        fs::path lst(last);
-        fs::path newpth = cwd / lst;
-        // std::cout << " " << newpth << " " << std::endl;
-        populate_dir(context.newDir, newpth);
-    }
+    fs::path cwd = fs::current_path();
+    fs::path currd(parts);
+    fs::path finalDir = cwd / parts;
+    populate_dir(context.newDir, finalDir); 
     
     std::string cmd = part;
     std::string extCmd = context.newDir->extendPrefix(cmd);
@@ -117,7 +114,7 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
             std::cout << cmdFull;
             std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
             if(context.tabSM->count == 2 && !currArgs.empty() && currArgs[0] == "directory") {
-                cmdFull += '\\';
+                cmdFull += '/';
                 std::cout << '/';
             } 
         }
@@ -129,7 +126,7 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
         }
         std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
         if(!currArgs.empty() && currArgs[0] == "directory") {
-            cmdFull += '\\';
+            cmdFull += '/';
             std::cout << '/';
         }
     }

@@ -93,8 +93,8 @@ std::string common_prefix(const std::string &str1, const std::string &str2) {
 }
 
 int populate_dir(Trie* curr, fs::path &cwd) {
-    curr->clear();
     if(fs::is_directory(cwd)) {
+        curr->clear();
         for(const auto& entry : fs::directory_iterator(cwd)) {
             std::string currpath = entry.path().string();
             if(fs::is_directory(currpath)) {
