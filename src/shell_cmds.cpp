@@ -16,7 +16,7 @@ std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ost
     {"help", shell_help}
 };
 
-
+// TODO: build handling for paths with spaces
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     std::string new_dir(args[1]);
 
@@ -85,30 +85,30 @@ int shell_listdir(std::vector<std::string> &args, std::ostream* out, std::ostrea
     }
     if (fs::is_directory(curr_dir)) {
 
-    std::vector<std::string> entries;
+        std::vector<std::string> entries;
 
-    for (const auto& entry : fs::directory_iterator(curr_dir)) {
-        if (fs::is_directory(entry.path())) {
-            entries.push_back(entry.path().filename().string() + "\\");
+        for (const auto& entry : fs::directory_iterator(curr_dir)) {
+            if (fs::is_directory(entry.path())) {
+                entries.push_back(entry.path().filename().string() + "\\");
+            }
+            else if (fs::is_regular_file(entry.path())) {
+                entries.push_back(entry.path().filename().string());
+            }
         }
-        else if (fs::is_regular_file(entry.path())) {
-            entries.push_back(entry.path().filename().string());
+
+        const int columnWidth = 30;
+
+        for (size_t i = 0; i < entries.size(); ++i) {
+            *out << std::left << std::setw(columnWidth) << entries[i];
+
+            if ((i + 1) % 3 == 0)
+                *out << '\n';
         }
-    }
 
-    const int columnWidth = 30;
-
-    for (size_t i = 0; i < entries.size(); ++i) {
-        *out << std::left << std::setw(columnWidth) << entries[i];
-
-        if ((i + 1) % 3 == 0)
+        // Newline if the last row wasn't complete
+        if (entries.size() % 3 != 0)
             *out << '\n';
     }
-
-    // Newline if the last row wasn't complete
-    if (entries.size() % 3 != 0)
-        *out << '\n';
-}
     return EXIT_SUCCESS;
 }
 

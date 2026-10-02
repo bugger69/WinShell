@@ -62,11 +62,13 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
     std::istringstream iss(cmdFull);
     std::vector<std::string> args;
     std::string last, part, parts;
+    fs::path cwd, finalDir;
     while(iss >> last) {
         args.push_back(last);
     }
 
     for(auto it : last) {
+        if(it == '~') continue;
         part += it;
         if(it == '/') {
             parts = parts.length() > 0 ? parts + '/' + part : parts + part;
@@ -74,11 +76,16 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
             continue;
         }
     }
+    
+    if(!last.empty() && last[0] != '~') {
+        cwd = fs::current_path();
+    } else if (last[0] == '~') {
+        const char* home = std::getenv("USERPROFILE");;
+        cwd = home;
+    }
 
-    fs::path cwd = fs::current_path();
-    fs::path currd(parts);
-    fs::path finalDir = cwd / parts;
-    populate_dir(context.newDir, finalDir); 
+    finalDir = cwd / parts;
+    populate_dir(context.newDir, finalDir);
     
     std::string cmd = part;
     std::string extCmd = context.newDir->extendPrefix(cmd);
