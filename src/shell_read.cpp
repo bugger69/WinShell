@@ -76,7 +76,7 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
             continue;
         }
     }
-    
+
     if(!last.empty() && last[0] != '~') {
         cwd = fs::current_path();
     } else if (last[0] == '~') {
@@ -160,7 +160,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_CMD;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         } else {
-            if(context.tabSM->count < 3 || context.tabSM->pathsPossible) context.tabSM->curr = TAB_AUTOCOMP_PATH;
+            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_PATH;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         }
 

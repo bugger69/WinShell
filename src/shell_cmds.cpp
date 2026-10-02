@@ -8,6 +8,7 @@
 
 std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream*, ShellContext &)> shell_cmds = {
     {"cd", shell_chdir},
+    {"complete", shell_complete},
     {"echo", shell_echo},
     {"exit", shell_exit},
     {"ls", shell_listdir},
@@ -42,6 +43,41 @@ int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream*
     } catch (const fs::filesystem_error e) {
         *err << "cd: " << e.what() << std::endl;
     }
+    return EXIT_SUCCESS;
+}
+
+int shell_complete(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
+    try {
+        if(args[1] == "-p") {
+            if(args.size() != 3) {
+                throw std::invalid_argument("Invalid arguments");
+            }
+            std::string cmd = args[2];
+            if(context.cmdComp.find(cmd) != context.cmdComp.end()) {
+                for(auto it : context.cmdComp[cmd]->currCompSet) {
+                    *out << it << " ";
+                }
+                *out << std::endl;
+            } else {
+                *out << "complete: " << cmd << ": no completion specification" << std::endl;
+            }
+        } else if (args[1] == "-C") {
+            if(args.size() != 4) {
+                throw std::invalid_argument("Invalid arguments");
+            }
+            std::string comp_path = args[2];
+            std::string cmd = args[3];
+            context.cmdComp[cmd] = new CompleteInfo();
+            for(auto it : args) {
+                context.cmdComp[cmd]->currCompSet.push_back(it);
+            }
+            context.cmdComp[cmd]->execPath = comp_path;
+        }
+
+    } catch (const std::invalid_argument e) {
+        *err << "complete: " << e.what() << std::endl;
+    }
+exit:
     return EXIT_SUCCESS;
 }
 
