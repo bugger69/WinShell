@@ -190,6 +190,8 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             } else if (vk == VK_TAB) { // TODO: Add support for two tabs
                 if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
                     handleAutocompeteCmd(inputBuffer, context);
+                } else if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
+                    // TODO: add seperate cases of scripts, files and directories, exp scripts
                 } else if (context.tabSM->curr == TAB_AUTOCOMP_PATH) {
                     handleAutocompetePath(inputBuffer, context);
                 } else {

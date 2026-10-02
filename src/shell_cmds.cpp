@@ -72,6 +72,7 @@ int shell_complete(std::vector<std::string> &args, std::ostream* out, std::ostre
                 context.cmdComp[cmd]->currCompSet.push_back(it);
             }
             context.cmdComp[cmd]->execPath = comp_path;
+            context.cmdComp[cmd]->compFlag = COMPLETE_AUTOCOMPLETE_SCRIPT;
         }
 
     } catch (const std::invalid_argument e) {
