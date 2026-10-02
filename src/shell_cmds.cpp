@@ -72,8 +72,16 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 int shell_listdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     fs::path curr_dir = fs::current_path();
     if(args.size() > 1) {
-        fs::path nwdir(args[1]);
-        curr_dir = curr_dir / nwdir;
+        if(args[1][0] == '~') {
+            const char* home = std::getenv("USERPROFILE");
+            fs::path homedir(home);
+            std::string rel_dir(args[1].size() > 2 ? args[1].begin() + 2 : args[1].begin() + 1, args[1].end());
+            fs::path reldir(rel_dir);
+            curr_dir = homedir / reldir;
+        } else {
+            fs::path nwdir(args[1]);
+            curr_dir = curr_dir / nwdir;
+        }
     }
     if (fs::is_directory(curr_dir)) {
 
