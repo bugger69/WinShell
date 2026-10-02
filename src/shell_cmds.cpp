@@ -71,6 +71,10 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 
 int shell_listdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     fs::path curr_dir = fs::current_path();
+    if(args.size() > 1) {
+        fs::path nwdir(args[1]);
+        curr_dir = curr_dir / nwdir;
+    }
     if (fs::is_directory(curr_dir)) {
 
     std::vector<std::string> entries;
