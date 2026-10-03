@@ -13,7 +13,10 @@
 #include "shell_context.hpp"
 #include "utils.hpp"
 
+void setAutoCompState(std::string &buf, ShellContext &context);
+
 void handleAutocompetePath(std::string &arg, ShellContext &context);
 void handleAutocompeteCmd(std::string &cmd, ShellContext &context);
+void handleAutocompeteComp(std::string &cmdFull, ShellContext &context);
 
 void shell_read(std::string &line, int &status, ShellContext &context);

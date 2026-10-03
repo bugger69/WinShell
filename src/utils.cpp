@@ -108,3 +108,100 @@ int populate_dir(Trie* curr, fs::path &cwd) {
     }
     return 0;
 }
+
+ProcessResult getOutputFromProcess(const std::wstring& command) {
+    HANDLE readPipe = nullptr;
+    HANDLE writePipe = nullptr;
+
+    /* Creating a Pipe */
+    SECURITY_ATTRIBUTES sa{};
+    sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+    sa.bInheritHandle = TRUE;
+
+    if (!CreatePipe(&readPipe, &writePipe, &sa, 0)) {
+        throw std::runtime_error("CreatePipe failed");
+    }
+
+    if (!SetHandleInformation(readPipe, HANDLE_FLAG_INHERIT, 0)) {
+        CloseHandle(readPipe);
+        CloseHandle(writePipe);
+        throw std::runtime_error("SetHandleInformation failed");
+    }
+
+    /* Startup Info for Process */
+    STARTUPINFOW si{};
+    si.cb = sizeof(STARTUPINFOW);
+
+    si.dwFlags |= STARTF_USESTDHANDLES;
+
+    si.hStdOutput = writePipe;
+    si.hStdError = writePipe;
+    si.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
+
+    /* Creating the Process */
+    PROCESS_INFORMATION pi{};
+    std::vector<wchar_t> cmd(command.begin(), command.end());
+    cmd.push_back(L'\0');
+
+    BOOL success = CreateProcessW(
+        nullptr,        // Application name
+        cmd.data(),     // Command line
+        nullptr,        // Process security attributes
+        nullptr,        // Thread security attributes
+        TRUE,           // Inherit handles
+        0,              // Creation flags
+        nullptr,        // Environment
+        nullptr,        // Current directory
+        &si,
+        &pi
+    );
+
+    if (!success) {
+        CloseHandle(readPipe);
+        CloseHandle(writePipe);
+
+        throw std::runtime_error("CreateProcessW failed");
+    }
+
+    /* close write */
+    CloseHandle(writePipe);
+    writePipe = nullptr;
+
+    /* Getting Output */
+    ProcessResult Out;
+    char buffer[4096];
+    DWORD bytesRead;
+
+        while (true) {
+        BOOL success = ReadFile(
+            readPipe,
+            buffer,
+            sizeof(buffer),
+            &bytesRead,
+            nullptr
+        );
+
+        if (!success || bytesRead == 0) {
+            break;
+        }
+
+        Out.output.append(buffer, bytesRead);
+    }
+
+    CloseHandle(readPipe);
+
+    /* Wait for Object */
+    WaitForSingleObject(pi.hProcess, INFINITE);
+
+    /* Exit Code */
+    GetExitCodeProcess(
+        pi.hProcess,
+        &Out.exitCode
+    );
+
+    /* Closing Handles */
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+
+    return Out;
+}

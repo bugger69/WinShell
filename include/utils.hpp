@@ -16,6 +16,14 @@ namespace fs = std::filesystem;
 #define DOUBLEQUOTESPCHARS {'"', '\\'}
 #define EXEC_PERMISSIONS (fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec)
 
+/* For running process*/
+struct ProcessResult {
+    std::string output;
+    DWORD exitCode;
+};
+
+ProcessResult getOutputFromProcess(const std::wstring& command);
+
 /* General Helpers */
 bool has_space(const std::string& cmd);
 int populate_dir(Trie* curr, fs::path &cwd);

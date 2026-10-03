@@ -14,6 +14,22 @@
 
 constexpr int TAB_SIZE = 4;
 
+void setAutoCompState(std::string &buf, ShellContext &context) {
+        if (!has_space(buf)) { // TODO: Create seperate function for this
+            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_CMD;
+            else context.tabSM->curr = TAB_AUTOCOMP_NONE;
+        } else {
+            std::string cmd;
+            for(auto it : buf) {
+                if(it == ' ') break;
+                cmd.push_back(it);
+            }
+            if(context.cmdComp.find(cmd) != context.cmdComp.end()) context.tabSM->curr = TAB_AUTOCOMP_ARG;
+            else if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_PATH;
+            else context.tabSM->curr = TAB_AUTOCOMP_NONE;
+        }
+}
+
 void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
     std::string extCmd = context.path->extendPrefix(cmd);
     std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
@@ -139,6 +155,45 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
     }
 }
 
+void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) {
+    std::string cmd;
+    std::string part;
+    std::istringstream iss(cmdFull);
+    std::vector<std::string> args;
+    for(auto it : cmdFull) {
+        if(it == ' ') break;
+        cmd += it;
+    }
+
+    while(iss >> part) {
+        args.push_back(part);
+    }
+
+    try {
+        if(context.cmdComp[cmd]->compFlag == COMPLETE_AUTOCOMPLETE_SCRIPT) {
+            ProcessResult Out;
+            fs::path currd = fs::current_path();
+            std::string cwd = currd.string();
+            std::string completer = context.cmdComp[cmd]->execPath;
+            std::wstring cmdStr;
+            cwd += '/';
+            cmdStr += std::wstring(cwd.begin(), cwd.end());
+            cmdStr += std::wstring(completer.begin(), completer.end()) + L" ";
+            cmdStr += std::wstring(part.begin(), part.end()) + L" ";
+            Out = getOutputFromProcess(cmdStr);
+            if(Out.exitCode) {
+                throw std::runtime_error("Unable to run compiler Script.");
+            }
+            cmdFull += Out.output;
+            cmdFull += ' ';
+            std::cout << Out.output;
+            std::cout << ' ';
+        }
+    } catch (std::runtime_error e) {
+        std::cout << "runtime error: " << e.what() << std::endl;
+    }
+}
+
 void shell_read(std::string &line, int &status, ShellContext &context) { // TODO: polish waiting for second tab logic
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -156,13 +211,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
     while(true) {
         ReadConsoleInput(hIn, &ir, 1, &read);
 
-        if (!has_space(inputBuffer)) { // TODO: Create seperate function for this
-            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_CMD;
-            else context.tabSM->curr = TAB_AUTOCOMP_NONE;
-        } else {
-            if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_PATH;
-            else context.tabSM->curr = TAB_AUTOCOMP_NONE;
-        }
+        setAutoCompState(inputBuffer, context);
 
         if(ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
             auto &ke = ir.Event.KeyEvent;
@@ -188,10 +237,10 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                     std::cout<< "\b \b" << std::flush;
                 }
             } else if (vk == VK_TAB) { // TODO: Add support for two tabs
-                if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
+                if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
+                    handleAutocompeteComp(inputBuffer, context);
+                } else if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
                     handleAutocompeteCmd(inputBuffer, context);
-                } else if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
-                    // TODO: add seperate cases of scripts, files and directories, exp scripts
                 } else if (context.tabSM->curr == TAB_AUTOCOMP_PATH) {
                     handleAutocompetePath(inputBuffer, context);
                 } else {
