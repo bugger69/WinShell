@@ -173,21 +173,33 @@ void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) {
         if(context.cmdComp[cmd]->compFlag == COMPLETE_AUTOCOMPLETE_SCRIPT) {
             ProcessResult Out;
             fs::path currd = fs::current_path();
+            std::string bash = "C:/Program Files/Git/bin/bash.exe";
             std::string cwd = currd.string();
             std::string completer = context.cmdComp[cmd]->execPath;
             std::wstring cmdStr;
             cwd += '/';
+            
             cmdStr += std::wstring(cwd.begin(), cwd.end());
             cmdStr += std::wstring(completer.begin(), completer.end()) + L" ";
+            cmdStr += std::wstring(cmd.begin(), cmd.end()) + L" ";
             cmdStr += std::wstring(part.begin(), part.end()) + L" ";
+            if(args.size() > 2) {
+                std::string prev = args[args.size() - 2];
+                cmdStr += std::wstring(prev.begin(), prev.end()) + L" ";
+            }
             Out = getOutputFromProcess(cmdStr);
             if(Out.exitCode) {
-                throw std::runtime_error("Unable to run compiler Script.");
+                throw std::runtime_error("Unable to run compiler Script: output:" + Out.output + ": ");
             }
-            cmdFull += Out.output;
-            cmdFull += ' ';
-            std::cout << Out.output;
-            std::cout << ' ';
+            if(!Out.output.empty()) {
+                cmdFull += Out.output;
+                cmdFull += ' ';
+                std::cout << Out.output;
+                std::cout << ' ';
+            } else {
+                std::cout << '\x07';
+            }
+
         }
     } catch (std::runtime_error e) {
         std::cout << "runtime error: " << e.what() << std::endl;
