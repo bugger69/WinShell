@@ -139,7 +139,7 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
             if(context.tabSM->count == 2 && !currArgs.empty() && currArgs[0] == "directory") {
                 cmdFull += '/';
                 std::cout << '/';
-            } 
+            }
         }
     } else {
         std::string str = remove_start(extCmd, cmd);
@@ -151,6 +151,9 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
         if(!currArgs.empty() && currArgs[0] == "directory") {
             cmdFull += '/';
             std::cout << '/';
+        } else {
+            cmdFull += ' ';
+            std::cout << ' ';
         }
     }
 }
@@ -179,6 +182,7 @@ void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) {
             std::wstring cmdStr;
             cwd += '/';
             
+            if(endsWith(completer, ".sh")) cmdStr += std::wstring(bash.begin(), bash.end()) + L" ";
             cmdStr += std::wstring(cwd.begin(), cwd.end());
             cmdStr += std::wstring(completer.begin(), completer.end()) + L" ";
             cmdStr += std::wstring(cmd.begin(), cmd.end()) + L" ";
@@ -186,16 +190,35 @@ void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) {
             if(args.size() > 2) {
                 std::string prev = args[args.size() - 2];
                 cmdStr += std::wstring(prev.begin(), prev.end()) + L" ";
+            } else {
+                cmdStr += L"\"\"";
             }
             Out = getOutputFromProcess(cmdStr);
             if(Out.exitCode) {
                 throw std::runtime_error("Unable to run compiler Script: output:" + Out.output + ": ");
             }
             if(!Out.output.empty()) {
-                cmdFull += Out.output;
-                cmdFull += ' ';
-                std::cout << Out.output;
-                std::cout << ' ';
+                std::vector<std::string> out = splitWords(Out.output);
+                if(out.size() == 0) {
+                    std::cout << '\x07';
+                } else if (out.size() == 1) {
+                    std::string finalCmd = out[0];
+                    std::string diff = remove_start(finalCmd, part);
+                    cmdFull += diff;
+                    cmdFull += ' ';
+                    std::cout << diff;
+                    std::cout << ' ';
+                } else {
+                    std::cout << '\n';
+                    for(auto it : out) {
+                        std::cout << it;
+                        std::cout << std::endl;
+                    }
+                    std::cout << '>';
+                    std::cout << ' ';
+                    std::cout << cmdFull;
+                }
+
             } else {
                 std::cout << '\x07';
             }

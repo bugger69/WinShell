@@ -22,6 +22,7 @@ struct ProcessResult {
     DWORD exitCode;
 };
 
+std::vector<std::string> splitWords(const std::string& str);
 ProcessResult getOutputFromProcess(const std::wstring& command);
 
 /* General Helpers */

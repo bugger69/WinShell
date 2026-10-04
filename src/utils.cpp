@@ -109,6 +109,18 @@ int populate_dir(Trie* curr, fs::path &cwd) {
     return 0;
 }
 
+std::vector<std::string> splitWords(const std::string& str) {
+    std::istringstream iss(str);
+    std::vector<std::string> words;
+    
+    std::string word;
+    while (iss >> word) {
+        words.push_back(word);
+    }
+
+    return words;
+}
+
 ProcessResult getOutputFromProcess(const std::wstring& command) {
     HANDLE readPipe = nullptr;
     HANDLE writePipe = nullptr;
