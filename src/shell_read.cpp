@@ -271,7 +271,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                     inputBuffer.pop_back();
                     std::cout<< "\b \b" << std::flush;
                 }
-            } else if (vk == VK_TAB) { // TODO: Add support for two tabs
+            } else if (vk == VK_TAB) {
                 if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
                     handleAutocompeteComp(inputBuffer, context);
                 } else if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
