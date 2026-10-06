@@ -52,6 +52,8 @@ public:
     std::vector<std::string> getInfo(std::string word);
     bool insert(std::string word, std::string exec);
     std::string extendPrefix(std::string prefix);
+    std::string extendPrefix(std::string prefix, std::string info);
     std::vector<std::string> allCmdsFromPrefix(std::string prefix);
+    std::vector<std::string> allCmdsFromPrefix(std::string prefix, std::string info);
     bool erase(std::string word);
 };

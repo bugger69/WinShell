@@ -24,8 +24,9 @@ void setAutoCompState(std::string &buf, ShellContext &context) {
                 if(it == ' ') break;
                 cmd.push_back(it);
             }
-            if(context.cmdComp.find(cmd) != context.cmdComp.end()) context.tabSM->curr = TAB_AUTOCOMP_ARG;
-            else if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_PATH;
+            if(context.cmdComp.find(cmd) != context.cmdComp.end() && context.cmdComp[cmd]->compFlag != COMPLETE_AUTOCOMPLETE_FILE && context.cmdComp[cmd]->compFlag != COMPLETE_AUTOCOMPLETE_DIRECTORY){ 
+                context.tabSM->curr = TAB_AUTOCOMP_ARG;
+            } else if(context.tabSM->count < 3) context.tabSM->curr = TAB_AUTOCOMP_PATH;
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         }
 }
@@ -77,8 +78,14 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
 void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
     std::istringstream iss(cmdFull);
     std::vector<std::string> args;
-    std::string last, part, parts;
+    std::string maincmd, last, part, parts;
     fs::path cwd, finalDir;
+
+    for(auto it : cmdFull) {
+        if(it == ' ') break;
+        maincmd += it;
+    }
+
     while(iss >> last) {
         args.push_back(last);
     }
@@ -104,8 +111,21 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
     populate_dir(context.newDir, finalDir);
     
     std::string cmd = part;
-    std::string extCmd = context.newDir->extendPrefix(cmd);
-    std::vector<std::string> allCmds = context.newDir->allCmdsFromPrefix(cmd);
+    std::string extCmd;
+    bool onlyDirs = false;
+    std::vector<std::string> allCmds;
+
+    if(context.cmdComp.find(maincmd) != context.cmdComp.end() && context.cmdComp[maincmd]->compFlag == COMPLETE_AUTOCOMPLETE_DIRECTORY) {
+        onlyDirs = true;
+    } 
+    if(onlyDirs) { 
+        extCmd = context.newDir->extendPrefix(cmd, "directory");
+        allCmds = context.newDir->allCmdsFromPrefix(cmd, "directory");
+    } else {
+        extCmd = context.newDir->extendPrefix(cmd);
+        allCmds = context.newDir->allCmdsFromPrefix(cmd);
+    }
+
     if((extCmd == cmd && !(context.newDir->search(extCmd))) || (allCmds.size() > 1)) {
         if(allCmds.size() == 0 && context.tabSM->count == 0) {
             std::cout << '\x07';
@@ -120,8 +140,19 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
             columnWidth += 4; // spacing between columns
 
             for (std::size_t i = 0; i < allCmds.size(); ++i) {
-                std::cout << std::left << std::setw(static_cast<int>(columnWidth))
+                bool isdir = false;
+                std::vector<std::string> info = context.newDir->getInfo(allCmds[i]);
+                for(auto it : info) {
+                    if(it == "directory") isdir = true;
+                }
+
+                if(isdir) {
+                    std::cout << std::left << std::setw(static_cast<int>(columnWidth))
+                        << allCmds[i] + '/';
+                } else {
+                    std::cout << std::left << std::setw(static_cast<int>(columnWidth))
                         << allCmds[i];
+                }
 
                 if ((i + 1) % 3 == 0) {
                     std::cout << '\n';
@@ -158,7 +189,7 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
     }
 }
 
-void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) {
+void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) { // TODO: Fix Bash Handling, esp path existing case.
     std::string cmd;
     std::string part;
     std::istringstream iss(cmdFull);
@@ -182,7 +213,7 @@ void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) {
             std::wstring cmdStr;
             cwd += '/';
             
-            if(endsWith(completer, ".sh")) cmdStr += std::wstring(bash.begin(), bash.end()) + L" ";
+            if(fs::is_regular_file(bash) && endsWith(completer, ".sh")) cmdStr += std::wstring(bash.begin(), bash.end()) + L" ";
             cmdStr += std::wstring(cwd.begin(), cwd.end());
             cmdStr += std::wstring(completer.begin(), completer.end()) + L" ";
             cmdStr += std::wstring(cmd.begin(), cmd.end()) + L" ";

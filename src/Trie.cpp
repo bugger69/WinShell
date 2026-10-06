@@ -212,6 +212,27 @@ std::string Trie :: extendPrefix(std::string prefix) {
     return extPrefix;
 }
 
+std::string Trie::extendPrefix(std::string prefix, std::string info) {
+    std::vector<std::string> candidates = allCmdsFromPrefix(prefix, info);
+    if (candidates.empty()) {
+        return prefix;
+    }
+
+    std::string common = candidates.front();
+
+    for (std::size_t i = 1; i < candidates.size(); ++i) {
+        std::size_t j = 0;
+        while (j < common.size() &&
+               j < candidates[i].size() &&
+               common[j] == candidates[i][j]) {
+            j++;
+        }
+        common.resize(j);
+    }
+
+    return common;
+}
+
 std::vector<std::string> Trie :: allCmdsFromPrefix(std::string prefix) {
     std::vector<std::string> allCmd;
     std::stack<std::pair<TrieNode*, std::string>> s;
@@ -233,6 +254,52 @@ std::vector<std::string> Trie :: allCmdsFromPrefix(std::string prefix) {
         s.pop();
         if (curr->isEndOfWord() && std::find(allCmd.begin(), allCmd.end(), command) == allCmd.end()) {
             allCmd.push_back(command);
+        }
+
+        for (char childSymbol : curr->getChildren()) {
+            TrieNode* next = curr->getChildNode(childSymbol);
+            s.push({next, command + childSymbol});
+        }
+    }
+
+    return allCmd;
+}
+
+std::vector<std::string> Trie :: allCmdsFromPrefix(std::string prefix, std::string info) { // TODO: Either this has a problem
+    std::vector<std::string> allCmd;
+    std::stack<std::pair<TrieNode*, std::string>> s;
+    TrieNode* curr = this->head;
+    int i = 0;
+
+    while(i < prefix.size()) {
+        TrieNode* next = curr->getChildNode(prefix[i]);
+        if (next == nullptr) return allCmd;
+        curr = next;
+        i++;
+    }
+
+    if(curr->isEndOfWord()) {
+        for(auto it : curr->getInfos()) {
+            if(it == info) {
+                allCmd.push_back(prefix);
+                break;
+            }
+        }
+    } 
+    s.push({curr, prefix});
+    while(!s.empty()) {
+        curr = s.top().first;
+        std::string command = s.top().second;
+
+        s.pop();
+        if (curr->isEndOfWord() && std::find(allCmd.begin(), allCmd.end(), command) == allCmd.end()) {
+            std::vector<std::string> infos = curr->getInfos();
+            for(auto it : infos) {
+                if(it == info) {
+                    allCmd.push_back(command);
+                    break;
+                }
+            }
         }
 
         for (char childSymbol : curr->getChildren()) {
