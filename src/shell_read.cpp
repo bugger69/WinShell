@@ -211,6 +211,8 @@ void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO
             std::string cwd = currd.string();
             std::string completer = context.cmdComp[cmd]->execPath;
             std::wstring cmdStr;
+            std::wstring compLine(inputSM->inputBuf.begin(), inputSM->inputBuf.end());
+            std::wstring compPoint = std::to_wstring(inputSM->cursPos);
             cwd += '/';
             
             if(fs::is_regular_file(bash) && endsWith(completer, ".sh")) cmdStr += std::wstring(bash.begin(), bash.end()) + L" ";
@@ -224,7 +226,17 @@ void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO
             } else {
                 cmdStr += L"\"\"";
             }
-            Out = getOutputFromProcess(cmdStr);
+            SetEnvironmentVariableW(L"COMP_LINE", compLine.c_str());
+            SetEnvironmentVariableW(L"COMP_POINT", compPoint.c_str());
+            try {
+                Out = getOutputFromProcess(cmdStr);
+            } catch (...) {
+                SetEnvironmentVariableW(L"COMP_LINE", nullptr);
+                SetEnvironmentVariableW(L"COMP_POINT", nullptr);
+                throw;
+            }
+            SetEnvironmentVariableW(L"COMP_LINE", nullptr);
+            SetEnvironmentVariableW(L"COMP_POINT", nullptr);
             if(Out.exitCode) {
                 throw std::runtime_error("Unable to run compiler Script: output:" + Out.output + ": ");
             }
