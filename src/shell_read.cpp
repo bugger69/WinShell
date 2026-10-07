@@ -31,14 +31,14 @@ void setAutoCompState(std::string &buf, ShellContext &context) {
         }
 }
 
-void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
-    std::string extCmd = context.path->extendPrefix(cmd);
-    std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(cmd);
-    if((extCmd == cmd && !(context.path->search(extCmd))) || (allCmds.size() > 1)) {
+void handleAutocompeteCmd(line_state *inputSM, ShellContext &context) {
+    std::string extCmd = context.path->extendPrefix(inputSM->inputBuf);
+    std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(inputSM->inputBuf);
+    if((extCmd == inputSM->inputBuf && !(context.path->search(extCmd))) || (allCmds.size() > 1)) {
         if(allCmds.size() == 0 && context.tabSM->count == 0) {
             std::cout << '\x07';
         } else if (context.tabSM->count > 0 && (allCmds.size() > 1 || context.path->search(extCmd))) { // TODO: Check the logic here
-            std::string diff = remove_start(extCmd, cmd);
+            std::string diff = remove_start(extCmd, inputSM->inputBuf);
             std::size_t columnWidth = 0;
             std::cout << '\n';
             for (const auto& command : allCmds) {
@@ -62,26 +62,26 @@ void handleAutocompeteCmd(std::string &cmd, ShellContext &context) {
             std::cout << '>';
             std::cout << ' ';
             std::cout << extCmd;
-            cmd += diff;
+            inputSM->inputBuf += diff;
         }
     } else {
-        std::string str = remove_start(extCmd, cmd);
+        std::string str = remove_start(extCmd, inputSM->inputBuf);
         for(auto it : str) {
-            cmd.push_back(it);
+            inputSM->inputBuf.push_back(it);
             std::cout << it;
         }
-        cmd.push_back(' ');
+        inputSM->inputBuf.push_back(' ');
         std::cout << ' ';
     }
 }
 
-void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
-    std::istringstream iss(cmdFull);
+void handleAutocompetePath(line_state *inputSM, ShellContext &context) {
+    std::istringstream iss(inputSM->inputBuf);
     std::vector<std::string> args;
     std::string maincmd, last, part, parts;
     fs::path cwd, finalDir;
 
-    for(auto it : cmdFull) {
+    for(auto it : inputSM->inputBuf) {
         if(it == ' ') break;
         maincmd += it;
     }
@@ -164,37 +164,37 @@ void handleAutocompetePath(std::string &cmdFull, ShellContext &context) {
             }
             std::cout << '>';
             std::cout << ' ';
-            cmdFull += diff;
-            std::cout << cmdFull;
+            inputSM->inputBuf += diff;
+            std::cout << inputSM->inputBuf;
             std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
             if(context.tabSM->count == 2 && !currArgs.empty() && currArgs[0] == "directory") {
-                cmdFull += '/';
+                inputSM->inputBuf += '/';
                 std::cout << '/';
             }
         }
     } else {
         std::string str = remove_start(extCmd, cmd);
         for(auto it : str) {
-            cmdFull.push_back(it);
+            inputSM->inputBuf.push_back(it);
             std::cout << it;
         }
         std::vector<std::string> currArgs = context.newDir->getInfo(extCmd);
         if(!currArgs.empty() && currArgs[0] == "directory") {
-            cmdFull += '/';
+            inputSM->inputBuf += '/';
             std::cout << '/';
         } else {
-            cmdFull += ' ';
+            inputSM->inputBuf += ' ';
             std::cout << ' ';
         }
     }
 }
 
-void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) { // TODO: Fix Bash Handling, esp path existing case.
+void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO: Fix Bash Handling, esp path existing case.
     std::string cmd;
     std::string part;
-    std::istringstream iss(cmdFull);
+    std::istringstream iss(inputSM->inputBuf);
     std::vector<std::string> args;
-    for(auto it : cmdFull) {
+    for(auto it : inputSM->inputBuf) {
         if(it == ' ') break;
         cmd += it;
     }
@@ -235,8 +235,8 @@ void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) { // TOD
                 } else if (out.size() == 1) {
                     std::string finalCmd = out[0];
                     std::string diff = remove_start(finalCmd, part);
-                    cmdFull += diff;
-                    cmdFull += ' ';
+                    inputSM->inputBuf += diff;
+                    inputSM->inputBuf += ' ';
                     std::cout << diff;
                     std::cout << ' ';
                 } else {
@@ -247,7 +247,7 @@ void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) { // TOD
                     }
                     std::cout << '>';
                     std::cout << ' ';
-                    std::cout << cmdFull;
+                    std::cout << inputSM->inputBuf;
                 }
 
             } else {
@@ -261,6 +261,7 @@ void handleAutocompeteComp(std::string &cmdFull, ShellContext &context) { // TOD
 }
 
 void shell_read(std::string &line, int &status, ShellContext &context) { // TODO: polish waiting for second tab logic
+    line_state *inputSM = new line_state();
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -269,7 +270,6 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
 
     SetConsoleMode(hIn, prevHandle & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT));
 
-    std::string inputBuffer;
     INPUT_RECORD ir;
     DWORD read;
     bool waitingForSecondTab = false;
@@ -277,7 +277,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
     while(true) {
         ReadConsoleInput(hIn, &ir, 1, &read);
 
-        setAutoCompState(inputBuffer, context);
+        setAutoCompState(inputSM->inputBuf, context);
 
         if(ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
             auto &ke = ir.Event.KeyEvent;
@@ -298,21 +298,21 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             }
 
             if(vk == VK_BACK) {
-                if(!inputBuffer.empty()) {
-                    inputBuffer.pop_back();
+                if(!inputSM->inputBuf.empty()) {
+                    inputSM->inputBuf.pop_back();
                     std::cout<< "\b \b" << std::flush;
                 }
             } else if (vk == VK_TAB) {
                 if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
-                    handleAutocompeteComp(inputBuffer, context);
+                    handleAutocompeteComp(inputSM, context);
                 } else if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
-                    handleAutocompeteCmd(inputBuffer, context);
+                    handleAutocompeteCmd(inputSM, context);
                 } else if (context.tabSM->curr == TAB_AUTOCOMP_PATH) {
-                    handleAutocompetePath(inputBuffer, context);
+                    handleAutocompetePath(inputSM, context);
                 } else {
-                    int spacesToAdd = TAB_SIZE - (static_cast<int>(inputBuffer.size()) % TAB_SIZE);
+                    int spacesToAdd = TAB_SIZE - (static_cast<int>(inputSM->inputBuf.size()) % TAB_SIZE);
                     for (int i = 0; i < spacesToAdd; ++i) {
-                        inputBuffer.push_back(' ');
+                        inputSM->inputBuf.push_back(' ');
                         std::cout << ' ';
                     }
                 }
@@ -323,15 +323,17 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                     context.newDir->clear();
                     context.newDir = new Trie(*context.CurrDir);
                 }
-                line = inputBuffer;
+                line = inputSM->inputBuf;
                 std::cout << std::endl;
-                inputBuffer.clear();
+                inputSM->inputBuf.clear();
                 break;
             } else if (ch >= 32 && ch <= 126) {
-                inputBuffer.push_back(ch);
+                inputSM->inputBuf.push_back(ch);
                 std::cout<<ch<<std::flush;
             }
         }
+        inputSM->cursPos = inputSM->inputBuf.size();
     }
     SetConsoleMode(hIn, prevHandle);
+    delete inputSM;
 }
