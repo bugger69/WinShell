@@ -217,7 +217,7 @@ void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO
             
             if(fs::is_regular_file(bash) && endsWith(completer, ".sh")) cmdStr += std::wstring(bash.begin(), bash.end()) + L" ";
             cmdStr += std::wstring(cwd.begin(), cwd.end());
-            cmdStr += std::wstring(completer.begin(), completer.end()) + L" ";
+            cmdStr += std::wstring(completer.begin(), completer.end()) + L" "; // TODO: Check the type of path
             cmdStr += std::wstring(cmd.begin(), cmd.end()) + L" ";
             cmdStr += std::wstring(part.begin(), part.end()) + L" ";
             if(args.size() > 2) {
@@ -242,7 +242,7 @@ void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO
             }
             if(!Out.output.empty()) {
                 std::vector<std::string> out = splitWords(Out.output);
-                if(out.size() == 0) {
+                if(out.size() == 0 || (out.size() > 1 && context.tabSM->count == 0)) {
                     std::cout << '\x07';
                 } else if (out.size() == 1) {
                     std::string finalCmd = out[0];
