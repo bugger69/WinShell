@@ -5,8 +5,33 @@
 #include <sstream>
 #include <cstdlib>
 #include <windows.h>
+#include <algorithm>
 #include "Trie.hpp"
 #include "utils.hpp"
+
+std::string lcp_pair(std::string str1, std::string str2) {
+    std::string pre = "";
+    size_t n = str1.size() > str2.size() ? str2.size() : str1.size();
+    for(size_t i = 0; i < n; i++) {
+        if(str1[i] == str2[i]) {
+            pre += str1[i];
+        } else break;
+    }
+    return pre;
+}
+
+std::string lcp(std::vector<std::string> arr, std::string pre){
+    std::string finalpre = pre;
+
+    if(arr.size() > 1) {
+        finalpre = lcp_pair(arr[0], arr[1]);
+        for(size_t i = 1; i < arr.size(); i++) {
+            finalpre = lcp_pair(finalpre, arr[1]);
+        }
+    }
+
+    return finalpre;
+}
 
 bool has_space(const std::string& cmd) {
     for(auto it : cmd) {

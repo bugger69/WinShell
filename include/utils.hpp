@@ -29,6 +29,10 @@ ProcessResult getOutputFromProcess(const std::wstring& command);
 bool has_space(const std::string& cmd);
 int populate_dir(Trie* curr, fs::path &cwd);
 
+/* LCP Helper */
+std::string lcp_pair(std::string str1, std::string str2);
+std::string lcp(std::vector<std::string> arr, std::string pre);
+
 /* Path helpers */
 bool execute_permission(const fs::path exec_path);
 const char* find_path_var();

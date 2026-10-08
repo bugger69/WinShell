@@ -233,7 +233,7 @@ void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO
             } catch (...) {
                 SetEnvironmentVariableW(L"COMP_LINE", nullptr);
                 SetEnvironmentVariableW(L"COMP_POINT", nullptr);
-                throw;
+                throw std::runtime_error("Unable to run compiler Script: output:" + Out.output + ": ");
             }
             SetEnvironmentVariableW(L"COMP_LINE", nullptr);
             SetEnvironmentVariableW(L"COMP_POINT", nullptr);
@@ -243,7 +243,12 @@ void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO
             if(!Out.output.empty()) {
                 std::vector<std::string> out = splitWords(Out.output);
                 if(out.size() == 0 || (out.size() > 1 && context.tabSM->count == 0)) {
-                    std::cout << '\x07';
+                    if(out.size() > 1) {
+                        std::string pre = lcp(out, part);
+                        std::string diff = remove_start(pre, part);
+                        inputSM->inputBuf += diff;
+                        std::cout << diff;
+                    } else std::cout << '\x07';
                 } else if (out.size() == 1) {
                     std::string finalCmd = out[0];
                     std::string diff = remove_start(finalCmd, part);
