@@ -30,7 +30,7 @@ void setAutoCompState(std::string &buf, ShellContext &context) {
             else context.tabSM->curr = TAB_AUTOCOMP_NONE;
         }
 }
-
+// TODO: Rewrite all three functions to make flow and logic more clear.
 void handleAutocompeteCmd(line_state *inputSM, ShellContext &context) {
     std::string extCmd = context.path->extendPrefix(inputSM->inputBuf);
     std::vector<std::string> allCmds = context.path->allCmdsFromPrefix(inputSM->inputBuf);
@@ -125,7 +125,7 @@ void handleAutocompetePath(line_state *inputSM, ShellContext &context) {
         extCmd = context.newDir->extendPrefix(cmd);
         allCmds = context.newDir->allCmdsFromPrefix(cmd);
     }
-
+    // (out.size() > 1 && context.tabSM->count == 0)
     if((extCmd == cmd && !(context.newDir->search(extCmd))) || (allCmds.size() > 1)) {
         if(allCmds.size() == 0 && context.tabSM->count == 0) {
             std::cout << '\x07';

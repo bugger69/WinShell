@@ -73,6 +73,15 @@ int shell_complete(std::vector<std::string> &args, std::ostream* out, std::ostre
             }
             context.cmdComp[cmd]->execPath = comp_path;
             context.cmdComp[cmd]->compFlag = COMPLETE_AUTOCOMPLETE_SCRIPT;
+        } else if (args[1] == "-r") {
+            if(args.size() != 3) {
+                throw std::invalid_argument("Invalid arguments");
+            }
+            std::string del = args[2];
+            auto it = context.cmdComp.find(del);
+            if(it != context.cmdComp.end()) {
+                context.cmdComp.erase(it);
+            }
         } else if (args[1] == "-f") {
             if(args.size() != 3) {
                 throw std::invalid_argument("Invalid arguments");
