@@ -77,11 +77,17 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found, ShellCon
 int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, OutputTarget &consoleOut, std::ostream* out, std::ostream* err, ShellContext &context)
 {
     int cmd_found = EXIT_FAILURE;
+    bool execInBackground = false;
     std::wstring command;
     std::string execPath = shell_find_exec(args, cmd_found, context);
     SECURITY_ATTRIBUTES sa{}; // create security attributes to enable inheritance
     HANDLE outputHandle = INVALID_HANDLE_VALUE;
     HANDLE errHandle = INVALID_HANDLE_VALUE;
+    int n = args[args.size() - 1] == "&" ? args.size() - 1 : args.size();
+
+    if(args[args.size() - 1] == "&") {
+        execInBackground = true;
+    }
 
     if (out != &std::cout) {  // check if filestream is opn, closes it in that case
         if (auto* fileStream = dynamic_cast<std::ofstream*>(out)) {
@@ -156,7 +162,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         }
     }
 
-    for (int i = 0; i < args.size(); i++) {
+    for (int i = 0; i < n; i++) {
         std::string arg = args[i];
         if(i == 0) {
             command += std::wstring(execPath.begin(), execPath.end()) + L" ";
@@ -178,7 +184,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         &pi                     // Pointer to PROCESS_INFORMATION structure
     );
 
-    if(status) {
+    if(status && !execInBackground) {
         WaitForSingleObject(pi.hProcess, INFINITE);
 
         DWORD exit_code;
@@ -187,6 +193,15 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         } else {
             std::cerr << "Error: GetExitCodeProcess failed with error code " << GetLastError() << std::endl;
         }
+        CloseHandle(outputHandle); // closing output handle 
+        CloseHandle(errHandle); // closing error handle
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    } else if (status && execInBackground) {
+        long long pid = pi.dwProcessId;
+
+        std::cout << '[' << 0 << ']' << ' ' << pid << '\n';
+
         CloseHandle(outputHandle); // closing output handle 
         CloseHandle(errHandle); // closing error handle
         CloseHandle(pi.hProcess);
