@@ -11,6 +11,7 @@ std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ost
     {"complete", shell_complete},
     {"echo", shell_echo},
     {"exit", shell_exit},
+    {"jobs", shell_jobs},
     {"ls", shell_listdir},
     {"type", shell_type},
     {"pwd", shell_pwd},
@@ -132,6 +133,10 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
         *out << "  " << it.first << std::endl;
     }
     // TODO: Add man command print here once implemented
+    return EXIT_SUCCESS;
+}
+
+int shell_jobs(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     return EXIT_SUCCESS;
 }
 
