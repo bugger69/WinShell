@@ -242,3 +242,25 @@ ProcessResult getOutputFromProcess(const std::wstring& command) {
 
     return Out;
 }
+
+ProcessStatus procStatus(DWORD pid) {
+    HANDLE process = OpenProcess(
+        PROCESS_QUERY_LIMITED_INFORMATION,
+        FALSE,
+        pid
+    );
+
+    if(!process) {
+        return ProcessStatus::Error;
+    }
+
+    DWORD exitCode;
+    if(GetExitCodeProcess(process, &exitCode)) {
+        if(exitCode == STILL_ACTIVE) {
+            return ProcessStatus::Running;
+        }
+    }
+
+    CloseHandle(process);
+    return ProcessStatus::Exited;
+}

@@ -137,6 +137,18 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 }
 
 int shell_jobs(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
+    std::map<int, ProcessInfo> jobs = context.jobs->allInfo;
+
+    for (auto it : jobs) {
+        *out << '[' << it.first << ']';
+        *out << '+';
+        *out << ' ';
+        *out << it.second.status;
+        *out << "\t\t";
+        *out << it.second.cmd;
+        *out << '\n';
+    }
+
     return EXIT_SUCCESS;
 }
 

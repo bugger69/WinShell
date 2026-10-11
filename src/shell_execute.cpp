@@ -78,6 +78,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
 {
     int cmd_found = EXIT_FAILURE;
     bool execInBackground = false;
+    std::string cmdstat = "Not Running";
     std::wstring command;
     std::string execPath = shell_find_exec(args, cmd_found, context);
     SECURITY_ATTRIBUTES sa{}; // create security attributes to enable inheritance
@@ -198,7 +199,15 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
     } else if (status && execInBackground) {
-        long long pid = pi.dwProcessId;
+        ProcessInfo *proc = &context.jobs->allInfo[context.jobs->processCount];
+        context.jobs->processCount += 1;
+        int pid = pi.dwProcessId;
+        std::string cmdstr(command.begin(), command.end());
+        cmdstat = "Running";
+
+        proc->pid = pid;
+        proc->cmd = cmdstr;
+        proc->status = cmdstat;
 
         std::cout << '[' << 0 << ']' << ' ' << pid << '\n';
 

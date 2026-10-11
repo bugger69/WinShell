@@ -25,6 +25,14 @@
 #define COMPLETE_AUTOCOMPLETE_FUNCTION 3
 #define COMPLETE_AUTOCOMPLETE_SCRIPT 4
 
+/* To store process Info */
+struct ProcessInfo {
+public:
+    int pid;
+    std::string status;
+    std::string cmd;
+};
+
 
 /* Tab state machine */
 struct Tabsm {
@@ -43,6 +51,13 @@ public:
     Trie* autoCompInfo;
 };
 
+/* To trach jobs */
+struct Jobs {
+public:
+    int processCount;
+    std::map<int, ProcessInfo> allInfo;
+};
+
 struct ShellContext {
 public:
     /* Path contains the path to all executables, and names of shell commands too for more streamlined search */
@@ -55,4 +70,6 @@ public:
     Tabsm* tabSM;
     /* Map of commands for command arguments autocomplete */
     std::map<std::string, CompleteInfo*> cmdComp;
+    /* To store newly created job process ids with shell job number */
+    Jobs* jobs;
 };

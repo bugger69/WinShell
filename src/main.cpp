@@ -43,6 +43,10 @@ ShellContext shell_init() {
         context.path->insert(it.first, "shell-command");
     }
 
+    /* Initialising Jobs */
+    context.jobs = new Jobs();
+    context.jobs->processCount = 0;
+
     /* Initializing path */
     while(std::getline(ss, directory, ';')) {
         fs::path target_path(directory);

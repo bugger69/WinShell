@@ -25,6 +25,15 @@ struct ProcessResult {
 std::vector<std::string> splitWords(const std::string& str);
 ProcessResult getOutputFromProcess(const std::wstring& command);
 
+/* Process status checking */
+enum class ProcessStatus {
+    Running,
+    Exited,
+    Error
+};
+
+ProcessStatus procStatus(DWORD pid);
+
 /* General Helpers */
 bool has_space(const std::string& cmd);
 int populate_dir(Trie* curr, fs::path &cwd);
