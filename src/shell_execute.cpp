@@ -199,11 +199,17 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
     } else if (status && execInBackground) {
-        ProcessInfo *proc = &context.jobs->allInfo[context.jobs->processCount];
-        context.jobs->processCount += 1;
+        ProcessInfo *proc;
         int pid = pi.dwProcessId;
         std::string cmdstr(command.begin(), command.end());
         cmdstat = "Running";
+        context.jobs->processCount += 1;
+
+        for(int i = 0; i <= context.jobs->processCount; i++) {
+            if(context.jobs->allInfo.find(i) == context.jobs->allInfo.end()) {
+                proc = &context.jobs->allInfo[i];
+            }
+        }
 
         proc->pid = pid;
         proc->cmd = cmdstr;

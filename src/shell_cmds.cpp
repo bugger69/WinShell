@@ -152,6 +152,7 @@ int shell_jobs(std::vector<std::string> &args, std::ostream* out, std::ostream* 
             *out << '\n';
         } else {
             jobs->erase(it.first);
+            context.jobs->processCount--;
         }
     }
 
