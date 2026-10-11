@@ -137,16 +137,22 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 }
 
 int shell_jobs(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
-    std::map<int, ProcessInfo> jobs = context.jobs->allInfo;
+    std::map<int, ProcessInfo> *jobs = &context.jobs->allInfo;
 
-    for (auto it : jobs) {
-        *out << '[' << it.first << ']';
-        *out << '+';
-        *out << ' ';
-        *out << it.second.status;
-        *out << "\t\t";
-        *out << it.second.cmd;
-        *out << '\n';
+    for(auto it : *jobs) {
+        DWORD pid = it.second.pid;
+        ProcessStatus status = procStatus(pid);
+        if(status == ProcessStatus::Running) {
+            *out << '[' << it.first << ']';
+            *out << '+';
+            *out << ' ';
+            *out << it.second.status;
+            *out << "\t\t";
+            *out << it.second.cmd;
+            *out << '\n';
+        } else {
+            jobs->erase(it.first);
+        }
     }
 
     return EXIT_SUCCESS;
