@@ -6,25 +6,22 @@
 
 namespace fs = std::filesystem;
 
-void no_arguments_case() { // TODO: merge these two cases into one function
+void show_stream(std::istream& in) {
     std::string line;
-    while(std::getline(std::cin, line)) {
-        std::cout << line << std::endl;
+    while(std::getline(in, line)) {
+        std::cout << line << '\n';
     }
 }
 
-void show_file_contents(std::vector<std::string> args) {
+void show_file(std::vector<std::string> args) {
     try {
         for(auto it : args) {
             fs::path filepath(it);
             std::ifstream file(filepath);
-            std::string line;
 
             if(!file.is_open()) throw std::runtime_error("File not found!!");
 
-            while(std::getline(file, line)) {
-                std::cout << line << std::endl;
-            }
+            show_stream(file);
         }
     } catch (const std::runtime_error& e) {
         std::cerr << "cat: " << e.what() << std::endl;
@@ -34,7 +31,7 @@ void show_file_contents(std::vector<std::string> args) {
 int main (int argc, char* argv[]) {
     std::vector<std::string> args(argv + 1, argv + argc);
 
-    args.size() > 0 ? show_file_contents(args) : no_arguments_case();
+    args.size() > 0 ? show_file(args) : show_stream(std::cin);
 
     return 0;
 }
