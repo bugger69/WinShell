@@ -264,3 +264,20 @@ ProcessStatus procStatus(DWORD pid) {
     CloseHandle(process);
     return ProcessStatus::Exited;
 }
+
+
+std::vector<std::vector<std::string>> parse_for_symbol(std::vector<std::string> args, std::string sym) {
+    std::vector<std::vector<std::string>> parsed_args;
+    std::vector<std::string> curr;
+
+    for(int i = 0; i < args.size(); i++) {
+        if(args[i] == sym || i == args.size() - 1) {
+            curr.clear();
+            parsed_args.push_back(curr);
+        }
+        curr.push_back(args[i]);
+    }
+
+
+    return parsed_args;
+} 
