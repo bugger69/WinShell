@@ -19,22 +19,6 @@
 // Default executables array
 #define EXEC_BIN_PATH "./modules/"
 
-// Output macros
-#define SHELL_CMD_OUT_STD_DEF 0
-#define SHELL_CMD_OUT_STD_FILE 1
-#define SHELL_CMD_OUT_STD_APPEND 2
-#define SHELL_CMD_OUT_ERR_DEF 0
-#define SHELL_CMD_OUT_ERR_FILE 1
-#define SHELL_CMD_OUT_ERR_APPEND 2
-
-
-class OutputTarget {
-    public:
-        int flag_std = SHELL_CMD_OUT_STD_DEF;
-        int flag_err = SHELL_CMD_OUT_ERR_DEF;
-        std::string file_std;
-        std::string file_err;
-};
 
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_complete(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);

@@ -25,6 +25,14 @@
 #define COMPLETE_AUTOCOMPLETE_FUNCTION 3
 #define COMPLETE_AUTOCOMPLETE_SCRIPT 4
 
+// Output macros
+#define SHELL_CMD_OUT_STD_DEF 0
+#define SHELL_CMD_OUT_STD_FILE 1
+#define SHELL_CMD_OUT_STD_APPEND 2
+#define SHELL_CMD_OUT_ERR_DEF 0
+#define SHELL_CMD_OUT_ERR_FILE 1
+#define SHELL_CMD_OUT_ERR_APPEND 2
+
 /* To store process Info */
 struct ProcessInfo {
 public:
@@ -58,6 +66,17 @@ public:
     std::map<int, ProcessInfo> allInfo;
 };
 
+/* Output Target Struct */
+class OutputTarget {
+    public:
+        int flag_std = SHELL_CMD_OUT_STD_DEF;
+        int flag_err = SHELL_CMD_OUT_ERR_DEF;
+        bool flag_pipe = false;
+        std::string file_std;
+        std::string file_err;
+        HANDLE pipeWrite = INVALID_HANDLE_VALUE;
+};
+
 struct ShellContext {
 public:
     /* Path contains the path to all executables, and names of shell commands too for more streamlined search */
@@ -72,4 +91,6 @@ public:
     std::map<std::string, CompleteInfo*> cmdComp;
     /* To store newly created job process ids with shell job number */
     Jobs* jobs;
+    /* To store output targets */
+    OutputTarget* consoleOut;
 };

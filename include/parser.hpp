@@ -10,4 +10,6 @@
 #include "shell_context.hpp"
 #include "utils.hpp"
 
+
+void setConsoleOutputBuf(std::vector<std::string> &args, OutputTarget &consoleOut);
 void shell_parse(const std::string &line, std::vector<std::string> &args, ShellContext &context);

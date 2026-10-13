@@ -47,6 +47,9 @@ ShellContext shell_init() {
     context.jobs = new Jobs();
     context.jobs->processCount = 0;
 
+    /* Initialising output target */
+    context.consoleOut = new OutputTarget();
+
     /* Initializing path */
     while(std::getline(ss, directory, ';')) {
         fs::path target_path(directory);
