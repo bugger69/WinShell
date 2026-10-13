@@ -197,8 +197,6 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, Shel
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    consoleOut = *context.consoleOut;
-
     if(consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE || consoleOut.flag_std == SHELL_CMD_OUT_STD_APPEND) {
         if(consoleOut.file_std == "") goto end;
         consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE ? file.open(consoleOut.file_std) : file.open(consoleOut.file_std, std::ios::app);

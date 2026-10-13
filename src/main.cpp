@@ -80,6 +80,7 @@ void shell_loop(ShellContext& context)
         std::cout << "> ";
         shell_read(line, status, context);
         shell_parse(line, args, context);
+        consoleOut = *context.consoleOut;
         status = shell_execute(args, consoleOut, context);
 
         line.clear();
