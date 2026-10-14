@@ -272,10 +272,10 @@ std::vector<std::vector<std::string>> parse_for_symbol(std::vector<std::string> 
 
     for(int i = 0; i < args.size(); i++) {
         if(args[i] == sym || i == args.size() - 1) {
-            curr.clear();
+            if(args[i] != sym) curr.push_back(args[i]);
             parsed_args.push_back(curr);
-        }
-        curr.push_back(args[i]);
+            curr.clear();
+        } else curr.push_back(args[i]);
     }
 
 

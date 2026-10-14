@@ -192,6 +192,7 @@ int shell_execute(std::vector<std::string> &args, ShellContext &context) // TODO
     std::ofstream file, errFile;
     std::ostream* out = &std::cout;
     std::ostream* err = &std::cerr;
+    std::vector<std::vector<std::string>> cmdVec;
 
     if(args.empty()) goto end;
 
@@ -218,10 +219,21 @@ int shell_execute(std::vector<std::string> &args, ShellContext &context) // TODO
         }
         err = &errFile;
     }
-    // TODO: Write code for all shell commands, and add support for more commands later
-    // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS 
-    if(shell_cmd_handler(args, out, err, context) == EXIT_FAILURE && shell_process_launch(args, si, pi, out, err, context) == EXIT_FAILURE) {
-        std::cerr << args[0] << ": command not found" << std::endl;
+
+    cmdVec = parse_for_symbol(args, ";");
+    // for(int i = 0; i < cmdVec.size(); i++) {
+    //     std::cout << "cmd" << i << ": ";
+    //     for(auto it : cmdVec[i]) {
+    //         std::cout << it << " ";
+    //     }
+    //     std::cout << '\n';
+    // }
+    for(auto it : cmdVec) {
+        if(!it.size()) continue;
+        
+        if(shell_cmd_handler(it, out, err, context) == EXIT_FAILURE && shell_process_launch(it, si, pi, out, err, context) == EXIT_FAILURE) {
+            std::cerr << args[0] << ": command not found" << std::endl;
+        }
     }
 
 end: // TODO: Reset consoleout here
