@@ -183,11 +183,12 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
     return EXIT_SUCCESS;
 }
 
-int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, ShellContext &context) // TODO: add basic commands
+int shell_execute(std::vector<std::string> &args, ShellContext &context) // TODO: add basic commands
 {
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
     int status;
+    OutputTarget *consoleOut = context.consoleOut;
     std::ofstream file, errFile;
     std::ostream* out = &std::cout;
     std::ostream* err = &std::cerr;
@@ -198,9 +199,9 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, Shel
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    if(consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE || consoleOut.flag_std == SHELL_CMD_OUT_STD_APPEND) {
-        if(consoleOut.file_std == "") goto end;
-        consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE ? file.open(consoleOut.file_std) : file.open(consoleOut.file_std, std::ios::app);
+    if(consoleOut->flag_std == SHELL_CMD_OUT_STD_FILE || consoleOut->flag_std == SHELL_CMD_OUT_STD_APPEND) {
+        if(consoleOut->file_std == "") goto end;
+        consoleOut->flag_std == SHELL_CMD_OUT_STD_FILE ? file.open(consoleOut->file_std) : file.open(consoleOut->file_std, std::ios::app);
         if (!file) {
             std::cerr << "Failed to open output file" << std::endl;
             goto end;
@@ -208,9 +209,9 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, Shel
         out = &file;
     }
 
-    if(consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE || consoleOut.flag_err == SHELL_CMD_OUT_ERR_APPEND) {
-        if(consoleOut.file_err == "") goto end;
-        consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE ? errFile.open(consoleOut.file_err) : errFile.open(consoleOut.file_err, std::ios::app);
+    if(consoleOut->flag_err == SHELL_CMD_OUT_ERR_FILE || consoleOut->flag_err == SHELL_CMD_OUT_ERR_APPEND) {
+        if(consoleOut->file_err == "") goto end;
+        consoleOut->flag_err == SHELL_CMD_OUT_ERR_FILE ? errFile.open(consoleOut->file_err) : errFile.open(consoleOut->file_err, std::ios::app);
         if (!errFile) {
             std::cerr << "Failed to open output file" << std::endl;
             goto end;
@@ -224,9 +225,9 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, Shel
     }
 
 end: // TODO: Reset consoleout here
-    consoleOut.flag_std = SHELL_CMD_OUT_STD_DEF;
-    consoleOut.file_std = "";
-    consoleOut.flag_err = SHELL_CMD_OUT_ERR_DEF;
-    consoleOut.file_err = "";
+    consoleOut->flag_std = SHELL_CMD_OUT_STD_DEF;
+    consoleOut->file_std = "";
+    consoleOut->flag_err = SHELL_CMD_OUT_ERR_DEF;
+    consoleOut->file_err = "";
     return EXIT_SUCCESS;
 }

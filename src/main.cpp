@@ -72,7 +72,6 @@ void shell_loop(ShellContext& context)
 {
     std::string line;
     std::vector<std::string> args;
-    OutputTarget consoleOut;
     int status = SHELL_STATUS_NORM;
 
     do
@@ -80,8 +79,7 @@ void shell_loop(ShellContext& context)
         std::cout << "> ";
         shell_read(line, status, context);
         shell_parse(line, args, context);
-        consoleOut = *context.consoleOut;
-        status = shell_execute(args, consoleOut, context);
+        status = shell_execute(args, context);
 
         line.clear();
         args.clear();
