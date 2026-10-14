@@ -28,7 +28,7 @@ std::string shell_find_exec(std::vector<std::string> &args, int &found, ShellCon
     return exec_path;
 }
 
-int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, OutputTarget &consoleOut, std::ostream* out, std::ostream* err, ShellContext &context)
+int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCESS_INFORMATION &pi, std::ostream* out, std::ostream* err, ShellContext &context)
 {
     int cmd_found = EXIT_FAILURE;
     bool execInBackground = false;
@@ -36,6 +36,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
     std::wstring command;
     std::string execPath = shell_find_exec(args, cmd_found, context);
     SECURITY_ATTRIBUTES sa{}; // create security attributes to enable inheritance
+    OutputTarget *consoleOut = context.consoleOut;
     HANDLE outputHandle = INVALID_HANDLE_VALUE;
     HANDLE errHandle = INVALID_HANDLE_VALUE;
     int n = args[args.size() - 1] == "&" ? args.size() - 1 : args.size();
@@ -58,22 +59,22 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
 
     if(cmd_found == EXIT_FAILURE) return EXIT_FAILURE;
 
-    if (consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE || consoleOut.flag_std == SHELL_CMD_OUT_STD_APPEND) {
+    if (consoleOut->flag_std == SHELL_CMD_OUT_STD_FILE || consoleOut->flag_std == SHELL_CMD_OUT_STD_APPEND) {
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
         sa.lpSecurityDescriptor = NULL;
         
         std::wstring filename( // create windows string
-            consoleOut.file_std.begin(),
-            consoleOut.file_std.end()
+            consoleOut->file_std.begin(),
+            consoleOut->file_std.end()
         );
 
         outputHandle = CreateFileW( // create file Write Handler
             filename.c_str(),
-            consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE ? GENERIC_WRITE : FILE_APPEND_DATA,
+            consoleOut->flag_std == SHELL_CMD_OUT_STD_FILE ? GENERIC_WRITE : FILE_APPEND_DATA,
             FILE_SHARE_WRITE, // gotta figure out how this works
             &sa,
-            consoleOut.flag_std == SHELL_CMD_OUT_STD_FILE ? CREATE_ALWAYS : OPEN_ALWAYS,
+            consoleOut->flag_std == SHELL_CMD_OUT_STD_FILE ? CREATE_ALWAYS : OPEN_ALWAYS,
             FILE_ATTRIBUTE_NORMAL,
             NULL
         );
@@ -87,22 +88,22 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         }
     }
 
-    if (consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE || consoleOut.flag_err == SHELL_CMD_OUT_ERR_APPEND) {
+    if (consoleOut->flag_err == SHELL_CMD_OUT_ERR_FILE || consoleOut->flag_err == SHELL_CMD_OUT_ERR_APPEND) {
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
         sa.lpSecurityDescriptor = NULL;
         
         std::wstring filename( // create windows string
-            consoleOut.file_err.begin(),
-            consoleOut.file_err.end()
+            consoleOut->file_err.begin(),
+            consoleOut->file_err.end()
         );
 
         errHandle = CreateFileW( // create file Write Handler
             filename.c_str(),
-            consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE ? GENERIC_WRITE : FILE_APPEND_DATA,
+            consoleOut->flag_err == SHELL_CMD_OUT_ERR_FILE ? GENERIC_WRITE : FILE_APPEND_DATA,
             FILE_SHARE_WRITE, // gotta figure out how this works
             &sa,
-            consoleOut.flag_err == SHELL_CMD_OUT_ERR_FILE ? CREATE_ALWAYS : OPEN_ALWAYS,
+            consoleOut->flag_err == SHELL_CMD_OUT_ERR_FILE ? CREATE_ALWAYS : OPEN_ALWAYS,
             FILE_ATTRIBUTE_NORMAL,
             NULL
         );
@@ -218,7 +219,7 @@ int shell_execute(std::vector<std::string> &args, OutputTarget &consoleOut, Shel
     }
     // TODO: Write code for all shell commands, and add support for more commands later
     // IF IT'S NOT A SHELL COMMAND, THEN LAUNCH IT AS A PROCESS 
-    if(shell_cmd_handler(args, out, err, context) == EXIT_FAILURE && shell_process_launch(args, si, pi, consoleOut, out, err, context) == EXIT_FAILURE) {
+    if(shell_cmd_handler(args, out, err, context) == EXIT_FAILURE && shell_process_launch(args, si, pi, out, err, context) == EXIT_FAILURE) {
         std::cerr << args[0] << ": command not found" << std::endl;
     }
 
