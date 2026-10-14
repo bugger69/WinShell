@@ -86,9 +86,9 @@ void shell_parse(const std::string &line, std::vector<std::string> &args, ShellC
             i++;
             continue;
         }
-        if(!isEscape(line, i) && (line[i] == ' ' || line[i] == ';')) {
+        if(!isEscape(line, i) && (line[i] == ' ' || line[i] == ';' || line[i] == '|')) {
             if(!curr.empty()) args.push_back(curr);
-            if(line[i] == ';') args.push_back({line[i]});
+            if(line[i] == ';' || line[i] == '|') args.push_back({line[i]});
             curr.clear();
             i++;
             continue;

@@ -13,7 +13,6 @@
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
-
 std::string shell_find_exec(std::vector<std::string> &args, int &found, ShellContext &context) { // TODO: Add support for full file paths and executables other than .exe(s)
     std::string suff = ".exe";
     std::string exe = remove_end(args[0], suff);
@@ -221,17 +220,17 @@ int shell_execute(std::vector<std::string> &args, ShellContext &context) // TODO
     }
 
     cmdVec = parse_for_symbol(args, ";");
-    // for(int i = 0; i < cmdVec.size(); i++) {
-    //     std::cout << "cmd" << i << ": ";
-    //     for(auto it : cmdVec[i]) {
-    //         std::cout << it << " ";
-    //     }
-    //     std::cout << '\n';
-    // }
     for(auto it : cmdVec) {
+        int status = EXIT_FAILURE, dum = 0;
         if(!it.size()) continue;
-        
-        if(shell_cmd_handler(it, out, err, context) == EXIT_FAILURE && shell_process_launch(it, si, pi, out, err, context) == EXIT_FAILURE) {
+
+        if(shell_find_exec(args, dum, context) == "shell-command") {
+            status = shell_cmd_handler(it, out, err, context);
+        } else {
+            status = shell_process_launch(it, si, pi, out, err, context);
+        }
+
+        if(status == EXIT_FAILURE) {
             std::cerr << args[0] << ": command not found" << std::endl;
         }
     }
