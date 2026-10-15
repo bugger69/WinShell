@@ -222,12 +222,21 @@ int shell_execute(std::vector<std::string> &args, ShellContext &context) // TODO
     cmdVec = parse_for_symbol(args, ";");
     for(auto it : cmdVec) {
         int status = EXIT_FAILURE, dum = 0;
+        std::vector<std::vector<std::string>> pipedCmds;
+
         if(!it.size()) continue;
 
-        if(shell_find_exec(args, dum, context) == "shell-command") {
-            status = shell_cmd_handler(it, out, err, context);
+        pipedCmds = parse_for_symbol(args, "|");
+        if(pipedCmds.size() <= 1) {
+            if(shell_find_exec(it, dum, context) == "shell-command") {
+                status = shell_cmd_handler(it, out, err, context);
+            } else {
+                status = shell_process_launch(it, si, pi, out, err, context);
+            }
         } else {
-            status = shell_process_launch(it, si, pi, out, err, context);
+            for(auto cmds : pipedCmds) {
+                // create pipe and execute commands
+            }
         }
 
         if(status == EXIT_FAILURE) {
