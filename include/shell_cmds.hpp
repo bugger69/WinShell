@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include "shell_context.hpp"
 
 // Shell Status
@@ -19,6 +20,7 @@
 // Default executables array
 #define EXEC_BIN_PATH "./modules/"
 
+void shell_join_builtin_jobs(ShellContext& context);
 
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_complete(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
@@ -32,3 +34,4 @@ int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 
 extern std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream*, ShellContext &)> shell_cmds;
+extern std::set<std::string> whiteList;

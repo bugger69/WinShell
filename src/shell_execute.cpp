@@ -160,8 +160,8 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         context.jobs->processCount += 1;
 
         for(int i = 0; i <= context.jobs->processCount; i++) {
-            if(context.jobs->allInfo.find(i) == context.jobs->allInfo.end()) {
-                proc = &context.jobs->allInfo[i];
+            if(context.jobs->processJobs.find(i) == context.jobs->processJobs.end()) {
+                proc = &context.jobs->processJobs[i];
             }
         }
 

@@ -10,6 +10,9 @@
 #include <map>
 #include <windows.h>
 #include <algorithm>
+#include <atomic>
+#include <memory>
+#include <thread>
 #include "Trie.hpp"
 
 /* Tab SM macros*/
@@ -59,11 +62,21 @@ public:
     Trie* autoCompInfo;
 };
 
-/* To trach jobs */
+/* To track builtin jobs */
+struct BuiltinJob {
+    std::string cmd;
+    std::atomic<bool> done{false};
+    int exitCode = EXIT_FAILURE;
+    std::thread worker;
+};
+
+/* To track jobs */
 struct Jobs {
 public:
     int processCount;
-    std::map<int, ProcessInfo> allInfo;
+    int nextBuiltinJobId;
+    std::map<int, ProcessInfo> processJobs;
+    std::map<int, std::unique_ptr<BuiltinJob>> builtinJobs;
 };
 
 /* Output Target Struct */

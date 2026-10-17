@@ -46,6 +46,7 @@ ShellContext shell_init() {
     /* Initialising Jobs */
     context.jobs = new Jobs();
     context.jobs->processCount = 0;
+    context.jobs->nextBuiltinJobId = 1;
 
     /* Initialising output target */
     context.consoleOut = new OutputTarget();

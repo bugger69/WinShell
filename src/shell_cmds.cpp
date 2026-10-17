@@ -3,6 +3,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
+#include <mutex>
+#include <system_error>
 #include "shell_cmds.hpp"
 #include "utils.hpp"
 
@@ -17,6 +20,23 @@ std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ost
     {"pwd", shell_pwd},
     {"help", shell_help}
 };
+
+std::set<std::string> whiteList = {
+    "echo",
+    "help",
+    "type"
+};
+
+void shell_join_builtin_jobs(ShellContext& context)
+{
+    for (auto& [id, job] : context.jobs->builtinJobs) {
+        if (job->worker.joinable()) {
+            job->worker.join();
+        }
+    }
+
+    context.jobs->builtinJobs.clear();
+}
 
 // TODO: build handling for paths with spaces
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
@@ -122,6 +142,7 @@ int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 
 int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     *out << "Exiting WinShell..." << std::endl;
+     shell_join_builtin_jobs(context);
     exit(EXIT_SUCCESS);
 }
 
@@ -137,7 +158,7 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 }
 
 int shell_jobs(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
-    std::map<int, ProcessInfo> *jobs = &context.jobs->allInfo;
+    std::map<int, ProcessInfo> *jobs = &context.jobs->processJobs;
 
     for(auto it : *jobs) {
         DWORD pid = it.second.pid;
@@ -153,6 +174,23 @@ int shell_jobs(std::vector<std::string> &args, std::ostream* out, std::ostream* 
         } else {
             jobs->erase(it.first);
             context.jobs->processCount--;
+        }
+    }
+
+    auto builtinJobs = &context.jobs->builtinJobs;
+    for(auto it = builtinJobs->begin(); it != builtinJobs->end(); ++it) {
+        BuiltinJob& job = *it->second;
+        bool done = job.done.load(std::memory_order_acquire);
+
+        if(done) {
+            if(job.worker.joinable()) {
+                job.worker.join();
+            }
+            builtinJobs->erase(it);
+        } else {
+            *out << "[B" << it->first << "] "
+            << (done ? "Done" : "Running")
+            << "\t" << job.cmd << '\n';
         }
     }
 
@@ -246,8 +284,54 @@ int shell_type(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 int shell_cmd_handler(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     if (args.empty()) return EXIT_FAILURE;
 
-    if(!(shell_cmds.find(args[0]) == shell_cmds.end())) // TODO: replace this line with trie search?
-        return shell_cmds[args[0]](args, out, err, context);
+    if(args[args.size() - 1] == "&" && whiteList.find(args[0]) != whiteList.end()) {
+        auto job = std::make_unique<BuiltinJob>();
+        int jobId;
+        BuiltinJob* jobPtr;
+        const auto builtin = shell_cmds[args[0]];
+        std::vector<std::string> workerArgs;
+        // remove &
+        args.pop_back();
+        workerArgs = args;
+        
+        for (std::size_t i = 0; i < args.size(); ++i) {
+            if (i != 0) job->cmd += ' ';
+            job->cmd += args[i];
+        }
+
+        jobPtr = job.get();
+        context.jobs->builtinJobs.emplace(jobId, std::move(job));
+        try {
+            jobPtr->worker = std::thread(
+                [
+                    jobPtr,
+                    builtin,
+                    workerArgs,
+                    out,
+                    err,
+                    contextPtr = &context
+                ] () mutable {
+                    try {
+                        static std::mutex outputMutex;
+                        std::lock_guard<std::mutex> lock(outputMutex);
+                        builtin(workerArgs, out, err, *contextPtr);
+                    } catch (...) {
+                        jobPtr->exitCode = EXIT_FAILURE;
+                        throw;
+                    }
+                    jobPtr->done.store(true, std::memory_order_release);
+                }
+            );
+        } catch (const std::system_error& e) {
+            *err << "shell: failed to start background job: " << e.what() << '\n';
+            return EXIT_FAILURE;
+        }
+    } else {
+        // remove & if present
+        if(args[args.size() - 1] == "&") args.pop_back();
+        if(!(shell_cmds.find(args[0]) == shell_cmds.end()))
+            return shell_cmds[args[0]](args, out, err, context);
+    }
 
     return EXIT_FAILURE;
 }
