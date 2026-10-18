@@ -142,7 +142,7 @@ int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 
 int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     *out << "Exiting WinShell..." << std::endl;
-     shell_join_builtin_jobs(context);
+    shell_join_builtin_jobs(context);
     exit(EXIT_SUCCESS);
 }
 
