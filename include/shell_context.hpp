@@ -65,7 +65,7 @@ public:
 /* To track builtin jobs */
 struct BuiltinJob {
     std::string cmd;
-    std::atomic<bool> done{false};
+    std::atomic<bool> done{false}; // to be accessed safely from multiple threads
     int exitCode = EXIT_FAILURE;
     std::thread worker;
 };
