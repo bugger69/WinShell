@@ -36,8 +36,8 @@ private:
     DWORD lastErr = ERROR_SUCCESS;
 
 protected:
-    int_type overflow(int_type ch) override;
-    std::streamsize xsputn(const char* data, std::streamsize) override;
+    int_type underflow(int_type ch);
+    std::streamsize xsgetn(const char* data, std::streamsize);
     int sync() override;
 
 public:
