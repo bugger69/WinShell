@@ -5,6 +5,7 @@
 #endif
 #include <iostream>
 #include <streambuf>
+#include <string>
 #include <windows.h>
 
 /* Stream Buffers */
@@ -33,19 +34,20 @@ public:
 class PipeInStreamBuf final : public std::streambuf {
 private:
     HANDLE inhandle;
+    std::string buffer;
     DWORD lastErr = ERROR_SUCCESS;
 
 protected:
-    int_type underflow(int_type ch);
-    std::streamsize xsgetn(const char* data, std::streamsize);
+    int_type underflow() override;
+    std::streamsize xsgetn(char* data, std::streamsize count) override;
     int sync() override;
 
 public:
     explicit PipeInStreamBuf(HANDLE ownedReadHandle) noexcept;
-    ~PipeInStreamBuf();
+    ~PipeInStreamBuf() override;
 
     PipeInStreamBuf(const PipeInStreamBuf&) = delete;
-    PipeInStreamBuf& operator=(const PipeOutStreamBuf&) = delete;
+    PipeInStreamBuf& operator=(const PipeInStreamBuf&) = delete;
 
     bool is_open() const noexcept;
     bool close_in_handle() noexcept;
