@@ -39,7 +39,7 @@ private:
 
 protected:
     int_type underflow() override;
-    std::streamsize xsgetn(char* data, std::streamsize count) override;
+    std::streamsize xsgetn(char* data, std::streamsize) override;
     int sync() override;
 
 public:
