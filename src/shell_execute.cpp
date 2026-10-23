@@ -416,20 +416,28 @@ int shell_execute(std::vector<std::string> &args, ShellContext &context) // TODO
                             ScopedHandle nextRead;
                             ScopedHandle nextWrite;
                             create_pipe(nextRead, nextWrite);
-                            workers.emplace_back(
-                                [cmds, writeHandle = nextWrite.release(), err, &context]() mutable {
-                                    PipeOutStream pipeOutput(writeHandle);
-                                    try {
-                                        shell_cmd_handler(cmds, &pipeOutput, err, context);
-                                    } catch(const std::exception& e) {
-                                        *err << "Pipeline builtin failed: " << e.what() << '\n';
-                                    } catch(...) {
-                                        *err << "Pipeline builtin failed with an unknown error\n";
+                            const bool isWhitelisted = whiteList.find(cmds[0]) != whiteList.end();
+                            if(isWhitelisted) {
+                                workers.emplace_back(
+                                    [cmds, writeHandle = nextWrite.release(), err, &context]() mutable {
+                                        PipeOutStream pipeOutput(writeHandle);
+                                        try {
+                                            shell_cmd_handler(cmds, &pipeOutput, err, context);
+                                        } catch(const std::exception& e) {
+                                            *err << "Pipeline builtin failed: " << e.what() << '\n';
+                                        } catch(...) {
+                                            *err << "Pipeline builtin failed with an unknown error\n";
+                                        }
                                     }
-                                }
-                            );
+                                );
+                            } else {
+                                PipeOutStream pipeOutput(nextWrite.release());
+                                status = shell_cmd_handler(cmds, &pipeOutput, err, context);
+                            }
                             previousRead = std::move(nextRead);
-                            status = EXIT_SUCCESS;
+                            if(isWhitelisted) {
+                                status = EXIT_SUCCESS;
+                            }
                         }
                     } else {
                         ScopedHandle nextRead;
