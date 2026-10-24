@@ -13,11 +13,6 @@
 #include "shell_context.hpp"
 #include "utils.hpp"
 
-struct line_state {
-    std::size_t cursPos;
-    std::string inputBuf;
-};
-
 void setAutoCompState(std::string &buf, ShellContext &context);
 
 void handleAutocompetePath(line_state *inputSM, ShellContext &context);

@@ -81,13 +81,22 @@ public:
 
 /* Output Target Struct */
 class OutputTarget {
-    public:
-        int flag_std = SHELL_CMD_OUT_STD_DEF;
-        int flag_err = SHELL_CMD_OUT_ERR_DEF;
-        bool flag_pipe = false;
-        std::string file_std;
-        std::string file_err;
-        HANDLE pipeWrite = INVALID_HANDLE_VALUE;
+public:
+    int flag_std = SHELL_CMD_OUT_STD_DEF;
+    int flag_err = SHELL_CMD_OUT_ERR_DEF;
+    bool flag_pipe = false;
+    std::string file_std;
+    std::string file_err;
+    HANDLE pipeWrite = INVALID_HANDLE_VALUE;
+};
+
+/* To store cursor position and update buffer*/
+class line_state {
+public:
+    std::size_t cursPos;
+    std::string inputBuf;
+    COORD inputStart;
+
 };
 
 struct ShellContext {

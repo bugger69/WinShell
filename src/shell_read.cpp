@@ -276,20 +276,24 @@ void handleAutocompeteComp(line_state *inputSM, ShellContext &context) { // TODO
         std::cout << "runtime error: " << e.what() << std::endl;
     }
 }
-
+// TODO: FIX WHEN YOU MOVE BETWEEN PATH AND PRESS TAB FUNCTIONALITY
 void shell_read(std::string &line, int &status, ShellContext &context) { // TODO: polish waiting for second tab logic
     line_state *inputSM = new line_state();
     HANDLE hIn = GetStdHandle(STD_INPUT_HANDLE);
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-
+    CONSOLE_SCREEN_BUFFER_INFO info;
     DWORD prevHandle;
     GetConsoleMode(hIn, &prevHandle);
+    if(!GetConsoleScreenBufferInfo(hOut, &info)) {}
+    inputSM->inputStart = info.dwCursorPosition;
 
     SetConsoleMode(hIn, prevHandle & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT));
 
     INPUT_RECORD ir;
     DWORD read;
     bool waitingForSecondTab = false;
+
+    inputSM->cursPos = 0;
 
     while(true) {
         ReadConsoleInput(hIn, &ir, 1, &read);
@@ -315,21 +319,39 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
             }
 
             if(vk == VK_BACK) {
-                if(!inputSM->inputBuf.empty()) {
-                    inputSM->inputBuf.pop_back();
-                    std::cout<< "\b \b" << std::flush;
+                if(!inputSM->inputBuf.empty() && inputSM->cursPos > 0) {
+                    if(inputSM->cursPos > 0) inputSM->cursPos -= 1;
+                    inputSM->inputBuf.erase(inputSM->cursPos, 1);
+                    // To correctly display the buffer
+                    // std::cout<< "\b \b" << std::flush;
+                    const std::size_t pos = inputSM->cursPos;
+                    int width = info.dwSize.X;
+                    int x = inputSM->inputStart.X + static_cast<int>(pos);
+                    int y = inputSM->inputStart.Y + x / width;
+                    x %= width;
+
+                    SetConsoleCursorPosition(hOut, COORD{
+                        static_cast<SHORT>(x),
+                        static_cast<SHORT>(y)
+                    });
+                    std::cout << inputSM->inputBuf.substr(pos) << ' ' << std::flush;
                 }
             } else if (vk == VK_TAB) {
                 if (context.tabSM->curr == TAB_AUTOCOMP_ARG) {
                     handleAutocompeteComp(inputSM, context);
+                    inputSM->cursPos = inputSM->inputBuf.size();
                 } else if (context.tabSM->curr == TAB_AUTOCOMP_CMD) {
                     handleAutocompeteCmd(inputSM, context);
+                    inputSM->cursPos = inputSM->inputBuf.size();
                 } else if (context.tabSM->curr == TAB_AUTOCOMP_PATH) {
                     handleAutocompetePath(inputSM, context);
+                    inputSM->cursPos = inputSM->inputBuf.size();
                 } else {
                     int spacesToAdd = TAB_SIZE - (static_cast<int>(inputSM->inputBuf.size()) % TAB_SIZE);
                     for (int i = 0; i < spacesToAdd; ++i) {
-                        inputSM->inputBuf.push_back(' ');
+                        const std::size_t pos = inputSM->cursPos;
+                        inputSM->inputBuf.insert(pos, 1, ' ');
+                        inputSM->cursPos += 1;
                         std::cout << ' ';
                     }
                 }
@@ -343,13 +365,48 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                 line = inputSM->inputBuf;
                 std::cout << std::endl;
                 inputSM->inputBuf.clear();
+                inputSM->cursPos = 0;
                 break;
+            } else if (vk == VK_LEFT) {
+                if(inputSM->cursPos > 0) inputSM->cursPos -= 1;
+            } else if (vk == VK_RIGHT) {
+                if(inputSM->cursPos < inputSM->inputBuf.size()) inputSM->cursPos += 1;
+            } else if (vk == VK_HOME) {
+                inputSM->cursPos = 0;
             } else if (ch >= 32 && ch <= 126) {
-                inputSM->inputBuf.push_back(ch);
-                std::cout<<ch<<std::flush;
+                const std::size_t pos = inputSM->cursPos;
+                inputSM->inputBuf.insert(pos, 1, ch);
+                inputSM->cursPos += 1;
+                // correctly displaying the output
+                // std::cout<<ch<<std::flush;
+                int width = info.dwSize.X;
+                int x = inputSM->inputStart.X + static_cast<int>(pos);
+                int y = inputSM->inputStart.Y + x / width;
+                x %= width;
+
+                SetConsoleCursorPosition(hOut, COORD{
+                    static_cast<SHORT>(x),
+                    static_cast<SHORT>(y)
+                });
+                std::cout << inputSM->inputBuf.substr(pos) << std::flush;
             }
+
+            // Repositioning the visible cursor
+            int width = info.dwSize.X;
+            int x = inputSM->inputStart.X + static_cast<int>(inputSM->cursPos);
+            int y = inputSM->inputStart.Y;
+
+            y += x / width;
+            x %= width;
+
+            COORD pos{
+                static_cast<SHORT>(x),
+                static_cast<SHORT>(y)
+            };
+
+            std::cout.flush();
+            SetConsoleCursorPosition(hOut, pos);
         }
-        inputSM->cursPos = inputSM->inputBuf.size();
     }
     SetConsoleMode(hIn, prevHandle);
     delete inputSM;
