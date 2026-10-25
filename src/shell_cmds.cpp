@@ -161,25 +161,39 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 int shell_history(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     std::size_t ind = 1;
     std::size_t st = 1;
-    if(args.size() > 1) {
+    if(args.size() > 1 && args[1] == "-r") {
+        if(args.size() > 2 && fs::exists(args[2])) {
+            std::ifstream file(args[2]);
+            std::string line;
+            while(getline(file, line)) {
+                context.history.push_back(line);
+            }
+        } else {
+            *err << "Enter valid file path\n" << std::flush;
+            return EXIT_SUCCESS;
+        }
+    } else if(args.size() > 1) {
         try {
             st = context.history.size() - static_cast<std::size_t>(std::stoull(args[1])) + 1;
         } catch (...) {
             throw;
         }
     }
-    for(auto it : context.history) {
-        if(ind >= st) {
-            *out << ' ';
-            *out << ' ';
-            *out << ind;
-            *out << ' ';
-            *out << ' ';
-            *out << it;
-            *out << '\n';
+    if(args.size() == 1 || (args.size() > 1 && args[1] != "-r")) {
+        for(auto it : context.history) {
+            if(ind >= st) {
+                *out << ' ';
+                *out << ' ';
+                *out << ind;
+                *out << ' ';
+                *out << ' ';
+                *out << it;
+                *out << '\n';
+            }
+            ind++;
         }
-        ind++;
     }
+
     return EXIT_SUCCESS;
 }
 
