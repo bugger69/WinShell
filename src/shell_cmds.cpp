@@ -159,9 +159,26 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 }
 
 int shell_history(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
+    std::size_t ind = 1;
+    std::size_t st = 1;
+    if(args.size() > 1) {
+        try {
+            st = context.history.size() - static_cast<std::size_t>(std::stoull(args[1]));
+        } catch (...) {
+            throw;
+        }
+    }
     for(auto it : context.history) {
-        *out << it;
-        *out << '\n';
+        if(ind > st) {
+            *out << ' ';
+            *out << ' ';
+            *out << ind;
+            *out << ' ';
+            *out << ' ';
+            *out << it;
+            *out << '\n';
+        }
+        ind++;
     }
     return EXIT_SUCCESS;
 }
