@@ -158,7 +158,13 @@ int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* 
     return EXIT_SUCCESS;
 }
 
-int shell_history(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {}
+int shell_history(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
+    for(auto it : context.history) {
+        *out << it;
+        *out << '\n';
+    }
+    return EXIT_SUCCESS;
+}
 
 int shell_jobs(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     std::map<int, ProcessInfo> *jobs = &context.jobs->processJobs;

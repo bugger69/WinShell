@@ -363,6 +363,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                     context.newDir = new Trie(*context.CurrDir);
                 }
                 line = inputSM->inputBuf;
+                context.history.push_back(inputSM->inputBuf);
                 std::cout << std::endl;
                 inputSM->inputBuf.clear();
                 inputSM->cursPos = 0;

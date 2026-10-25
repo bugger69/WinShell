@@ -115,4 +115,6 @@ public:
     Jobs* jobs;
     /* To store output targets */
     OutputTarget* consoleOut;
+    /* To store command history */
+    std::vector<std::string> history;
 };
