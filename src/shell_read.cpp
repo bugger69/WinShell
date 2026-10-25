@@ -366,6 +366,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                 line = inputSM->inputBuf;
                 if(!inputSM->inputBuf.empty()) {
                     context.history.push_back(inputSM->inputBuf);
+                    cursor = context.history.size();  
                 }
                 std::cout << std::endl;
                 inputSM->inputBuf.clear();
@@ -375,6 +376,34 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                 if(inputSM->cursPos > 0) inputSM->cursPos -= 1;
             } else if (vk == VK_RIGHT) {
                 if(inputSM->cursPos < inputSM->inputBuf.size()) inputSM->cursPos += 1;
+            } else if (vk == VK_UP) {
+                if(cursor > 0) cursor--;
+                for(auto it : inputSM->inputBuf) std::cout << '\b';
+                size_t curr_len, prev_len = inputSM->inputBuf.size();
+                inputSM->inputBuf.clear();
+                inputSM->cursPos = 0;
+                inputSM->inputBuf = context.history[cursor];
+                curr_len = inputSM->inputBuf.size();
+                inputSM->cursPos = context.history[cursor].size();
+                std::cout << inputSM->inputBuf;
+                if(curr_len < prev_len) {
+                    for(int i = 0; i < prev_len - curr_len; i++) std::cout << ' ';
+                    for(int i = 0; i < prev_len - curr_len; i++) std::cout << '\b';
+                }
+            } else if (vk == VK_DOWN) {
+                if(cursor < context.history.size() - 1) cursor++;
+                for(auto it : inputSM->inputBuf) std::cout << '\b';
+                size_t curr_len, prev_len = inputSM->inputBuf.size();
+                inputSM->inputBuf.clear();
+                inputSM->cursPos = 0;
+                inputSM->inputBuf = context.history[cursor];
+                curr_len = inputSM->inputBuf.size();
+                inputSM->cursPos = context.history[cursor].size();
+                std::cout << inputSM->inputBuf;
+                if(curr_len < prev_len) {
+                    for(int i = 0; i < prev_len - curr_len; i++) std::cout << ' ';
+                    for(int i = 0; i < prev_len - curr_len; i++) std::cout << '\b';
+                }
             } else if (vk == VK_HOME) {
                 inputSM->cursPos = 0;
             } else if (ch >= 32 && ch <= 126) {
