@@ -280,4 +280,16 @@ std::vector<std::vector<std::string>> parse_for_symbol(std::vector<std::string> 
 
 
     return parsed_args;
-} 
+}
+
+bool isNum(const std::string& str) {
+    try {
+        std::size_t pos;
+        std::stoi(str, &pos);
+        return pos == str.size();
+    } catch (const std::invalid_argument&) {
+        return false;
+    } catch (const std::out_of_range&) {
+        return false;
+    }
+}

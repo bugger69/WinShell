@@ -183,6 +183,16 @@ int shell_history(std::vector<std::string> &args, std::ostream* out, std::ostrea
             *err << "Unable to load file\n" << std::flush;
             return EXIT_SUCCESS;
         }
+    } else if (args.size() > 1 && args[1] == "-a") {
+        if(args.size() > 2) {
+            std::ofstream file(args[2], std::ios::app);
+            for(auto it : context.history) {
+                file << it << std::endl;
+            }
+        } else {
+            *err << "Unable to load file\n" << std::flush;
+            return EXIT_SUCCESS;
+        }
     } else if(args.size() > 1) {
         try {
             st = context.history.size() - static_cast<std::size_t>(std::stoull(args[1])) + 1;
@@ -190,7 +200,7 @@ int shell_history(std::vector<std::string> &args, std::ostream* out, std::ostrea
             throw;
         }
     }
-    if(args.size() == 1 || (args.size() > 1 && args[1] != "-r" && args[1] != "-w")) {
+    if(args.size() == 1 || (args.size() > 1 && isNum(args[1]))) {
         for(auto it : context.history) {
             if(ind >= st) {
                 *out << ' ';
