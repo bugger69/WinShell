@@ -283,6 +283,7 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO info;
     DWORD prevHandle;
+    std::size_t cursor = context.history.size();
     GetConsoleMode(hIn, &prevHandle);
     if(!GetConsoleScreenBufferInfo(hOut, &info)) {}
     inputSM->inputStart = info.dwCursorPosition;
@@ -363,7 +364,9 @@ void shell_read(std::string &line, int &status, ShellContext &context) { // TODO
                     context.newDir = new Trie(*context.CurrDir);
                 }
                 line = inputSM->inputBuf;
-                context.history.push_back(inputSM->inputBuf);
+                if(!inputSM->inputBuf.empty()) {
+                    context.history.push_back(inputSM->inputBuf);
+                }
                 std::cout << std::endl;
                 inputSM->inputBuf.clear();
                 inputSM->cursPos = 0;

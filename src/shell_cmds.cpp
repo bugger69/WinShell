@@ -163,13 +163,13 @@ int shell_history(std::vector<std::string> &args, std::ostream* out, std::ostrea
     std::size_t st = 1;
     if(args.size() > 1) {
         try {
-            st = context.history.size() - static_cast<std::size_t>(std::stoull(args[1]));
+            st = context.history.size() - static_cast<std::size_t>(std::stoull(args[1])) + 1;
         } catch (...) {
             throw;
         }
     }
     for(auto it : context.history) {
-        if(ind > st) {
+        if(ind >= st) {
             *out << ' ';
             *out << ' ';
             *out << ind;
