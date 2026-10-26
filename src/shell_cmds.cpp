@@ -145,7 +145,7 @@ int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* 
     *out << "Exiting WinShell..." << std::endl;
     const char* histfile = std::getenv("HISTFILE");
     if(fs::exists(histfile)) {
-        std::ofstream hist(histfile);
+        std::ofstream hist(histfile, std::ios::app);
         for(auto it : context.history) {
             hist << it;
             hist << '\n';
