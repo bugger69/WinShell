@@ -12,6 +12,7 @@
 std::map<std::string, int(*)(std::vector<std::string> &, std::ostream*, std::ostream*, ShellContext &)> shell_cmds = {
     {"cd", shell_chdir},
     {"complete", shell_complete},
+    {"declare", shell_declare},
     {"echo", shell_echo},
     {"exit", shell_exit},
     {"history", shell_history},
@@ -130,6 +131,10 @@ int shell_complete(std::vector<std::string> &args, std::ostream* out, std::ostre
         *err << "complete: " << e.what() << std::endl;
     }
 exit:
+    return EXIT_SUCCESS;
+}
+
+int shell_declare(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     return EXIT_SUCCESS;
 }
 

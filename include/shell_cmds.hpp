@@ -24,6 +24,7 @@ void shell_join_builtin_jobs(ShellContext& context);
 
 int shell_chdir(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_complete(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
+int shell_declare(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
 int shell_help(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context);
