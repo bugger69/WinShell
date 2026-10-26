@@ -143,6 +143,14 @@ int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* 
 
 int shell_exit(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     *out << "Exiting WinShell..." << std::endl;
+    const char* histfile = std::getenv("HISTFILE");
+    if(fs::exists(histfile)) {
+        std::ofstream hist(histfile);
+        for(auto it : context.history) {
+            hist << it;
+            hist << '\n';
+        }
+    }
     shell_join_builtin_jobs(context);
     exit(EXIT_SUCCESS);
 }
