@@ -36,6 +36,9 @@
 #define SHELL_CMD_OUT_ERR_FILE 1
 #define SHELL_CMD_OUT_ERR_APPEND 2
 
+// Default History file
+#define DEF_HIST_FILE "./history.txt"
+
 /* To store process Info */
 struct ProcessInfo {
 public:

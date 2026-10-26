@@ -66,6 +66,24 @@ ShellContext shell_init() {
             }
         }
     }
+
+    /* Initializing History environment variable */
+    const char* histfile = std::getenv("HISTFILE");
+    if(histfile == nullptr) {
+        if(_putenv_s("HISTFILE", DEF_HIST_FILE) != 0) {
+            std::cout << "Unable to set history file\n" << std::flush;
+        } else {
+            histfile = std::getenv("HISTFILE");
+        }
+    }
+    if(fs::exists(histfile)) {
+        std::ifstream hist(histfile);
+        std::string line;
+        while(getline(hist, line)) {
+            context.history.push_back(line);
+        }
+    }
+    
     return context;
 }
 
