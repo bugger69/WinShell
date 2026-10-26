@@ -71,7 +71,7 @@ ShellContext shell_init() {
     const char* histfile = std::getenv("HISTFILE");
     if(histfile == nullptr) {
         if(_putenv_s("HISTFILE", DEF_HIST_FILE) != 0) {
-            std::cout << "Unable to set history file\n" << std::flush;
+            std::cerr << "Unable to set history file\n" << std::flush;
         } else {
             histfile = std::getenv("HISTFILE");
         }

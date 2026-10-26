@@ -135,6 +135,42 @@ exit:
 }
 
 int shell_declare(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
+    if(args.size() > 1) {
+        if(args[1] == "-p") {
+            if(args.size() > 2) {
+                const char* variable = std::getenv(args[2].c_str());
+                *out << "declare";
+                if(variable != nullptr) {
+                    *out << " -- " << args[2] << "=" << variable << std::endl;
+                } else {
+                    *out << ": " << args[2] << ": not found" << std::endl;
+                }
+            }
+        } else {
+            std::string all(args[1]);
+            std::string var, val;
+            int i = 0;
+            try {
+                for(auto it : all) {
+                    if(it == '=') break;
+                    i++;
+                }
+                if(i >= all.size()) throw std::invalid_argument("expected NAME=VALUE");;
+                for(int j = 0; j < all.size(); j++) {
+                    if(j < i) var += all[j];
+                    else if(j > i) val += all[j];
+                }
+                if(!var.empty() && !val.empty()) {
+                    if(std::getenv(var.c_str()) == 0 && _putenv_s(var.c_str(), val.c_str()) != 0) {
+                        throw std::invalid_argument("expected NAME=VALUE");
+                    }
+                } else throw std::invalid_argument("expected NAME=VALUE");
+            } catch (const std::exception& e) {
+                *err << "declare: " << e.what() << '\n';
+            }
+        }
+    }
+
     return EXIT_SUCCESS;
 }
 
