@@ -40,6 +40,9 @@ int populate_dir(Trie* curr, fs::path &cwd);
 bool isNum(const std::string& str);
 bool isValidName(const std::string& str);
 
+/* Shell Variable Helpers */
+std::string replaceShellVariables(std::string arg);
+
 /* LCP Helper */
 std::string lcp_pair(std::string str1, std::string str2);
 std::string lcp(std::vector<std::string> arr, std::string pre);

@@ -96,7 +96,12 @@ void shell_parse(const std::string &line, std::vector<std::string> &args, ShellC
         if(!isCurrEscape(line, i)) curr += line[i];
         i++;
     }
-    if(!curr.empty()) args.push_back(curr);
+
+    if(!curr.empty()) {
+        std::string rplStr = replaceShellVariables(curr);
+        args.push_back(rplStr);
+    }
+    
     curr.clear();
     if (context.consoleOut != nullptr) {
         setConsoleOutputBuf(args, *context.consoleOut);

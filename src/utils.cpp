@@ -4,6 +4,7 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
+#include <cctype>
 #include <windows.h>
 #include <algorithm>
 #include "Trie.hpp"
@@ -301,4 +302,51 @@ bool isValidName(const std::string& str) {
         if(!isalnum(static_cast<unsigned char>(str[i])) && str[i] != '_') return false;
     }
     return true;
+}
+
+std::string replaceShellVariables(std::string arg) {
+    std::string result;
+    for (size_t i = 0; i < arg.size(); ++i) {
+        if (arg[i] != '$') {
+            result.push_back(arg[i]);
+            continue;
+        }
+
+        if (i + 1 >= arg.size()) {
+            result.push_back('$');
+            break;
+        }
+
+        std::string varName;
+        size_t next = i + 1;
+
+        if (arg[next] == '{') {
+            size_t end = arg.find('}', next + 1);
+            if (end == std::string::npos) {
+                result.push_back('$');
+                continue;
+            }
+            varName = arg.substr(next + 1, end - next - 1);
+            i = end;
+        } else {
+            size_t j = next;
+            while (j < arg.size() && (std::isalnum(static_cast<unsigned char>(arg[j])) || arg[j] == '_')) {
+                ++j;
+            }
+            varName = arg.substr(next, j - next);
+            i = j - 1;
+        }
+
+        if (varName.empty()) {
+            result.push_back('$');
+            continue;
+        }
+
+        const char* value = std::getenv(varName.c_str());
+        if (value != nullptr) {
+            result += value;
+        }
+    }
+
+    return result;
 }
