@@ -10,131 +10,7 @@
 #include "Trie.hpp"
 #include "utils.hpp"
 
-std::string lcp_pair(std::string str1, std::string str2) {
-    std::string pre = "";
-    size_t n = str1.size() > str2.size() ? str2.size() : str1.size();
-    for(size_t i = 0; i < n; i++) {
-        if(str1[i] == str2[i]) {
-            pre += str1[i];
-        } else break;
-    }
-    return pre;
-}
-
-std::string lcp(std::vector<std::string> arr, std::string pre){
-    std::string finalpre = pre;
-
-    if(arr.size() > 1) {
-        finalpre = lcp_pair(arr[0], arr[1]);
-        for(size_t i = 1; i < arr.size(); i++) {
-            finalpre = lcp_pair(finalpre, arr[1]);
-        }
-    }
-
-    return finalpre;
-}
-
-bool has_space(const std::string& cmd) {
-    for(auto it : cmd) {
-        if(it == ' ') return true;
-    }
-    return false;
-}
-
-bool endsWith(const std::string& mainStr, const std::string& suffix) {
-    if (mainStr.length() < suffix.length()) return false;
-    return mainStr.rfind(suffix) == (mainStr.length() - suffix.length());
-}
-
-const char* find_path_var() {
-    const char* path_env = std::getenv("PATH");
-    if(!path_env) {
-        std::cout << "WinShell: unable to find path." << std::endl;
-    }
-    return path_env;
-}
-
-bool execute_permission(const fs::path exec_path) {
-    if(!fs::exists(exec_path)) {
-        return false;
-    }
-    fs::perms p = fs::status(exec_path).permissions();
-    return ((p & EXEC_PERMISSIONS) != fs::perms::none);
-}
-
-bool isEscape(const std::string &line, int i) {
-    if(i > 0 && line[i - 1] == '\\') return true;
-    return false;
-}
-
-bool isCurrEscape(const std::string &line, int i) {
-    if(i > 0 && line[i - 1] != '\\' && line[i] == '\\') return true;
-    return false;
-}
-
-bool isDoubleQuoteSp(const std::string &line, int i) {
-    for(auto it : DOUBLEQUOTESPCHARS) {
-        if(i < line.size() - 1 && line[i] == '\\' && line[i + 1] == it) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool startsWith(const std::string& mainStr, const std::string& prefix) {
-    if(prefix.size() > mainStr.size()) return false;
-    return mainStr.find(prefix) == 0;
-}
-
-std::string remove_start(const std::string &cmd, std::string& prefix) {
-    if(startsWith(cmd, prefix)) {
-        std::string str(cmd.begin() + prefix.size(), cmd.end());
-        return str;
-    }
-    return cmd;
-}
-
-std::string remove_end(const std::string &cmd, std::string& suffix) {
-    if(endsWith(cmd, suffix)) {
-        std::string str(cmd.begin(), cmd.end() - suffix.size());
-        return str;
-    }
-    return cmd;
-}
-
-std::string common_prefix(const std::string &str1, const std::string &str2) {
-    std::size_t k = 0;
-    std::string ans;
-    if(str1.size() > str2.size()) {
-        k = str2.size();
-    } else {
-        k = str1.size();
-    }
-    for(int i = 0; i < k; i++) {
-        if(str1[i] == str2[i]) {
-            ans += str1[i];
-        } else break;
-    }
-    return ans;
-}
-
-int populate_dir(Trie* curr, fs::path &cwd) {
-    if(fs::is_directory(cwd)) {
-        curr->clear();
-        for(const auto& entry : fs::directory_iterator(cwd)) {
-            std::string currpath = entry.path().string();
-            if(fs::is_directory(currpath)) {
-                std::string dir = entry.path().filename().string();
-                curr->insert(dir, "directory");
-            } else if(fs::is_regular_file(currpath)) {
-                std::string file = entry.path().filename().string();
-                curr->insert(file, "file");
-            }
-        }
-    }
-    return 0;
-}
-
+/* For running process*/
 std::vector<std::string> splitWords(const std::string& str) {
     std::istringstream iss(str);
     std::vector<std::string> words;
@@ -266,22 +142,31 @@ ProcessStatus procStatus(DWORD pid) {
     return ProcessStatus::Exited;
 }
 
-
-std::vector<std::vector<std::string>> parse_for_symbol(std::vector<std::string> args, std::string sym) {
-    std::vector<std::vector<std::string>> parsed_args;
-    std::vector<std::string> curr;
-
-    for(int i = 0; i < args.size(); i++) {
-        if(args[i] == sym || i == args.size() - 1) {
-            if(args[i] != sym) curr.push_back(args[i]);
-            parsed_args.push_back(curr);
-            curr.clear();
-        } else curr.push_back(args[i]);
+/* General Helpers */
+bool has_space(const std::string& cmd) {
+    for(auto it : cmd) {
+        if(it == ' ') return true;
     }
-
-
-    return parsed_args;
+    return false;
 }
+
+int populate_dir(Trie* curr, fs::path &cwd) {
+    if(fs::is_directory(cwd)) {
+        curr->clear();
+        for(const auto& entry : fs::directory_iterator(cwd)) {
+            std::string currpath = entry.path().string();
+            if(fs::is_directory(currpath)) {
+                std::string dir = entry.path().filename().string();
+                curr->insert(dir, "directory");
+            } else if(fs::is_regular_file(currpath)) {
+                std::string file = entry.path().filename().string();
+                curr->insert(file, "file");
+            }
+        }
+    }
+    return 0;
+}
+
 
 bool isNum(const std::string& str) {
     try {
@@ -304,6 +189,7 @@ bool isValidName(const std::string& str) {
     return true;
 }
 
+/* Shell Variable Helpers */
 std::string replaceShellVariables(std::string arg) {
     std::string result, var;
     
@@ -345,3 +231,127 @@ std::string replaceShellVariables(std::string arg) {
 
     return result;
 }
+
+/* LCP Helper */
+std::string lcp_pair(std::string str1, std::string str2) {
+    std::string pre = "";
+    size_t n = str1.size() > str2.size() ? str2.size() : str1.size();
+    for(size_t i = 0; i < n; i++) {
+        if(str1[i] == str2[i]) {
+            pre += str1[i];
+        } else break;
+    }
+    return pre;
+}
+
+std::string lcp(std::vector<std::string> arr, std::string pre){
+    std::string finalpre = pre;
+
+    if(arr.size() > 1) {
+        finalpre = lcp_pair(arr[0], arr[1]);
+        for(size_t i = 1; i < arr.size(); i++) {
+            finalpre = lcp_pair(finalpre, arr[1]);
+        }
+    }
+
+    return finalpre;
+}
+
+/* Path helpers */
+bool execute_permission(const fs::path exec_path) {
+    if(!fs::exists(exec_path)) {
+        return false;
+    }
+    fs::perms p = fs::status(exec_path).permissions();
+    return ((p & EXEC_PERMISSIONS) != fs::perms::none);
+}
+
+const char* find_path_var() {
+    const char* path_env = std::getenv("PATH");
+    if(!path_env) {
+        std::cout << "WinShell: unable to find path." << std::endl;
+    }
+    return path_env;
+}
+
+bool endsWith(const std::string& mainStr, const std::string& suffix) {
+    if (mainStr.length() < suffix.length()) return false;
+    return mainStr.rfind(suffix) == (mainStr.length() - suffix.length());
+}
+
+/* Escape Char helpers */
+bool isEscape(const std::string &line, int i) {
+    if(i > 0 && line[i - 1] == '\\') return true;
+    return false;
+}
+
+bool isCurrEscape(const std::string &line, int i) {
+    if(i > 0 && line[i - 1] != '\\' && line[i] == '\\') return true;
+    return false;
+}
+
+bool isDoubleQuoteSp(const std::string &line, int i) {
+    for(auto it : DOUBLEQUOTESPCHARS) {
+        if(i < line.size() - 1 && line[i] == '\\' && line[i + 1] == it) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/* Input Autocomplete helpers */
+bool startsWith(const std::string& mainStr, const std::string& prefix) {
+    if(prefix.size() > mainStr.size()) return false;
+    return mainStr.find(prefix) == 0;
+}
+
+std::string remove_start(const std::string &cmd, std::string& prefix) {
+    if(startsWith(cmd, prefix)) {
+        std::string str(cmd.begin() + prefix.size(), cmd.end());
+        return str;
+    }
+    return cmd;
+}
+
+std::string remove_end(const std::string &cmd, std::string& suffix) {
+    if(endsWith(cmd, suffix)) {
+        std::string str(cmd.begin(), cmd.end() - suffix.size());
+        return str;
+    }
+    return cmd;
+}
+
+std::string common_prefix(const std::string &str1, const std::string &str2) {
+    std::size_t k = 0;
+    std::string ans;
+    if(str1.size() > str2.size()) {
+        k = str2.size();
+    } else {
+        k = str1.size();
+    }
+    for(int i = 0; i < k; i++) {
+        if(str1[i] == str2[i]) {
+            ans += str1[i];
+        } else break;
+    }
+    return ans;
+}
+
+/* Pipe and semicolon helpers */
+std::vector<std::vector<std::string>> parse_for_symbol(std::vector<std::string> args, std::string sym) {
+    std::vector<std::vector<std::string>> parsed_args;
+    std::vector<std::string> curr;
+
+    for(int i = 0; i < args.size(); i++) {
+        if(args[i] == sym || i == args.size() - 1) {
+            if(args[i] != sym) curr.push_back(args[i]);
+            parsed_args.push_back(curr);
+            curr.clear();
+        } else curr.push_back(args[i]);
+    }
+
+
+    return parsed_args;
+}
+
+
