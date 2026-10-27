@@ -305,47 +305,42 @@ bool isValidName(const std::string& str) {
 }
 
 std::string replaceShellVariables(std::string arg) {
-    std::string result;
-    for (size_t i = 0; i < arg.size(); ++i) {
-        if (arg[i] != '$') {
-            result.push_back(arg[i]);
+    std::string result, var;
+    
+    for(size_t i = 0; i < arg.size(); i++) {
+        if(arg[i] != '$') {
+            result += arg[i];
             continue;
         }
 
-        if (i + 1 >= arg.size()) {
-            result.push_back('$');
-            break;
+        if(i + 1 >= arg.size()) {
+            result += '$';
         }
 
-        std::string varName;
-        size_t next = i + 1;
-
-        if (arg[next] == '{') {
-            size_t end = arg.find('}', next + 1);
-            if (end == std::string::npos) {
-                result.push_back('$');
+        if(arg[i + 1] == '{') {
+            size_t end = arg.find('}', i + 2);
+            if(end == std::string::npos) {
+                result += '$';
                 continue;
             }
-            varName = arg.substr(next + 1, end - next - 1);
+            var = arg.substr(i + 1, end);
             i = end;
         } else {
-            size_t j = next;
-            while (j < arg.size() && (std::isalnum(static_cast<unsigned char>(arg[j])) || arg[j] == '_')) {
+            int j = i + 1;
+            while(j < arg.size() && (isalnum(arg[j]) || arg[j] == '_')) {
                 j++;
             }
-            varName = arg.substr(next, j - next);
+            var = arg.substr(i + 1, j);
             i = j - 1;
         }
 
-        if (varName.empty()) {
-            result.push_back('$');
+        if(var.empty()) {
+            result += '$';
             continue;
         }
 
-        const char* value = std::getenv(varName.c_str());
-        if (value != nullptr) {
-            result += value;
-        }
+        const char* val = std::getenv(var.c_str());
+        if(val != nullptr) result += val;
     }
 
     return result;
