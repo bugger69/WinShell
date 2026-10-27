@@ -331,7 +331,7 @@ std::string replaceShellVariables(std::string arg) {
         } else {
             size_t j = next;
             while (j < arg.size() && (std::isalnum(static_cast<unsigned char>(arg[j])) || arg[j] == '_')) {
-                ++j;
+                j++;
             }
             varName = arg.substr(next, j - next);
             i = j - 1;
