@@ -76,6 +76,10 @@ ShellContext shell_init() {
             histfile = std::getenv("HISTFILE");
         }
     }
+    if(!fs::exists(histfile)) {
+        std::ofstream hist(histfile);
+        hist.close();
+    }
     if(fs::exists(histfile)) {
         std::ifstream hist(histfile);
         std::string line;

@@ -293,3 +293,12 @@ bool isNum(const std::string& str) {
         return false;
     }
 }
+
+bool isValidName(const std::string& str) {
+    if(str.empty()) return false;
+    for(int i = 0; i < str.size(); i++) {
+        if(i == 0 && !isalpha(str[i]) && str[i] != '_') return false;
+        if(!isalnum(static_cast<unsigned char>(str[i])) && str[i] != '_') return false;
+    }
+    return true;
+}

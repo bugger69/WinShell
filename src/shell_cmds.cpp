@@ -155,13 +155,14 @@ int shell_declare(std::vector<std::string> &args, std::ostream* out, std::ostrea
                     if(it == '=') break;
                     i++;
                 }
-                if(i >= all.size()) throw std::invalid_argument("expected NAME=VALUE");;
+                if(i >= all.size()) throw std::invalid_argument("expected NAME=VALUE");
                 for(int j = 0; j < all.size(); j++) {
                     if(j < i) var += all[j];
                     else if(j > i) val += all[j];
                 }
                 if(!var.empty() && !val.empty()) {
-                    if(std::getenv(var.c_str()) == 0 && _putenv_s(var.c_str(), val.c_str()) != 0) {
+                    if(!isValidName(var)) throw std::invalid_argument(all + ": not a valid identifier");
+                    if(_putenv_s(var.c_str(), val.c_str()) != 0) {
                         throw std::invalid_argument("expected NAME=VALUE");
                     }
                 } else throw std::invalid_argument("expected NAME=VALUE");

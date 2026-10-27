@@ -38,6 +38,7 @@ ProcessStatus procStatus(DWORD pid);
 bool has_space(const std::string& cmd);
 int populate_dir(Trie* curr, fs::path &cwd);
 bool isNum(const std::string& str);
+bool isValidName(const std::string& str);
 
 /* LCP Helper */
 std::string lcp_pair(std::string str1, std::string str2);
