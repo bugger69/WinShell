@@ -6,7 +6,7 @@
 
 namespace fs = std::filesystem;
 
-void get_from_stream(std::istream& in, std::string pattern) {
+void grep_from_stream(std::istream& in, std::string pattern) {
     std::string line;
     while(getline(in, line)) {
         std::cout << line << '\n';
@@ -16,7 +16,7 @@ void get_from_stream(std::istream& in, std::string pattern) {
 void read_from_stdout(std::vector<std::string> args) {
     std::string pattern(args[0]);
 
-    get_from_stream(std::cin, pattern);
+    grep_from_stream(std::cin, pattern);
 }
 
 void read_from_file(std::vector<std::string> args) {
@@ -24,7 +24,7 @@ void read_from_file(std::vector<std::string> args) {
     fs::path filepath(args[1]);
     std::ifstream fstr(filepath);
 
-    get_from_stream(fstr, pattern);
+    grep_from_stream(fstr, pattern);
 }
 
 int main(int argc, char* argv[]) {
