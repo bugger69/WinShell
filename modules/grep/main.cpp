@@ -8,6 +8,8 @@ namespace fs = std::filesystem;
 
 void grep_from_stream(std::istream& in, std::string pattern) {
     std::string line;
+    std::smatch matches;
+    std::regex re(pattern);
     while(getline(in, line)) {
         std::cout << line << '\n';
     }
