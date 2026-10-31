@@ -11,7 +11,7 @@ void grep_from_stream(std::istream& in, std::string pattern) {
     std::smatch matches;
     std::regex re(pattern);
     while(getline(in, line)) {
-        std::cout << line << '\n';
+        if(std::regex_search(line, matches, re)) std::cout << line << '\n';
     }
 }
 
