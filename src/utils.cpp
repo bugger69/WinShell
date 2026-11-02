@@ -142,6 +142,31 @@ ProcessStatus procStatus(DWORD pid) {
     return ProcessStatus::Exited;
 }
 
+std::wstring quote_windows_arg(std::wstring_view arg) {
+    std::wstring quoted = L"\"";
+    std::size_t backslashes = 0;
+
+    for (wchar_t ch : arg) {
+        if (ch == L'\\') {
+            ++backslashes;
+        } else if (ch == L'"') {
+            // Escape backslashes before a quote, then escape the quote itself.
+            quoted.append(backslashes * 2 + 1, L'\\');
+            quoted += L'"';
+            backslashes = 0;
+        } else {
+            quoted.append(backslashes, L'\\');
+            quoted += ch;
+            backslashes = 0;
+        }
+    }
+
+    // Double trailing backslashes so they don't escape the closing quote.
+    quoted.append(backslashes * 2, L'\\');
+    quoted += L'"';
+    return quoted;
+}
+
 /* General Helpers */
 bool has_space(const std::string& cmd) {
     for(auto it : cmd) {

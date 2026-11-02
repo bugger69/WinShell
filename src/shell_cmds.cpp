@@ -177,7 +177,8 @@ int shell_declare(std::vector<std::string> &args, std::ostream* out, std::ostrea
 
 int shell_echo(std::vector<std::string> &args, std::ostream* out, std::ostream* err, ShellContext &context) {
     for(int i = 1; i < args.size(); i++) {
-        *out << args[i] << " ";
+        if(i > 1) *out << " ";
+        *out << args[i];
     }
     *out << std::endl;
     return EXIT_SUCCESS;

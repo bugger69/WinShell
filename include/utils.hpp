@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <cstdlib>
+#include <string_view>
 #include <windows.h>
 #include "Trie.hpp"
 
@@ -33,6 +34,7 @@ enum class ProcessStatus {
 };
 
 ProcessStatus procStatus(DWORD pid);
+std::wstring quote_windows_arg(std::wstring_view arg);
 
 /* General Helpers */
 bool has_space(const std::string& cmd);

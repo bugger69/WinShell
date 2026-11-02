@@ -137,8 +137,8 @@ namespace {
         for(std::size_t i = 0; i < args.size(); ++i) {
             const std::string& arg = args[i];
             const std::string& text = i == 0 ? execPath : arg;
-            command += std::wstring(text.begin(), text.end());
-            command += L" ";
+            if(!has_space(arg)) command += std::wstring(text.begin(), text.end()) + L" ";
+            else command += quote_windows_arg(std::wstring(text.begin(), text.end())) + L" ";
         }
 
         ScopedHandle childInput = duplicate_inheritable_handle(input);
@@ -271,7 +271,8 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         if(i == 0) {
             command += std::wstring(execPath.begin(), execPath.end()) + L" ";
         } else {
-            command += std::wstring(arg.begin(), arg.end()) + L" ";
+            if(!has_space(arg)) command += std::wstring(arg.begin(), arg.end()) + L" ";
+            else command += quote_windows_arg(std::wstring(arg.begin(), arg.end())) + L" ";
         }
     }
     
