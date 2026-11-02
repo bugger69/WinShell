@@ -16,14 +16,14 @@ void grep_from_stream(std::istream& in, std::string pattern) {
 }
 
 void read_from_stdout(std::vector<std::string> args) {
-    std::string pattern(args[0]);
+    std::string pattern(args[args.size() - 1]);
 
     grep_from_stream(std::cin, pattern);
 }
 
 void read_from_file(std::vector<std::string> args) {
-    std::string pattern(args[0]);
-    fs::path filepath(args[1]);
+    std::string pattern(args[args.size() - 2  < 0 ? 0 : args.size() - 2]);
+    fs::path filepath(args[args.size() - 1]);
     std::ifstream fstr(filepath);
 
     grep_from_stream(fstr, pattern);
