@@ -3,6 +3,7 @@
 #include <regex>
 #include <fstream>
 #include <filesystem>
+#include <algorithm>
 #include "context.hpp"
 
 namespace fs = std::filesystem;
@@ -11,6 +12,20 @@ void setParamsFromFlags(std::vector<std::string> &flags, Params &par) {
     for(auto it : flags) {
         if(it == "-o") {
             par.onlyMatching = true;
+        } else if (it.compare(0, 8, "--color=") == 0) {
+            std::string mode = "";
+            for(size_t i = 0; i < it.size(); i++) {
+                if(i > 7) {
+                    mode += it[i];
+                }
+            }
+            if(mode == "none") {
+                par.highlight = HIGHLIGHT_NONE;
+            } else if (mode == "auto") {
+                par.highlight = HIGHLIGHT_AUTO;
+            } else if (mode == "always") {
+                par.highlight = HIGHLIGHT_ALWAYS;
+            }
         }
     }
 }
@@ -27,9 +42,34 @@ int grep_from_stream(std::istream& in, std::string pattern, Params &par) {
                 didMatch = true;
             }
         } else {
-            if(std::regex_search(line, matches, re)) {
-                std::cout << line << '\n';
-                didMatch = true;
+            if(par.highlight == HIGHLIGHT_NONE) {
+                if(std::regex_search(line, matches, re)) {
+                    std::cout << line << '\n';
+                    didMatch = true;
+                }
+            } else {
+                std::size_t cursor = 0;
+                bool lineMatched = false;
+
+                for (std::sregex_iterator it(line.begin(), line.end(), re), end;
+                    it != end;
+                    ++it) {
+                    const auto start = static_cast<std::size_t>(it->position());
+                    const auto length = static_cast<std::size_t>(it->length());
+
+                    std::cout << line.substr(cursor, start - cursor)
+                            << "\033[1;31m"
+                            << it->str()
+                            << "\033[0m";
+
+                    cursor = start + length;
+                    lineMatched = true;
+                }
+
+                if (lineMatched) {
+                    std::cout << line.substr(cursor) << '\n';
+                    didMatch = true;
+                }
             }
         }
     }
