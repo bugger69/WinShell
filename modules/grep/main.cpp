@@ -4,6 +4,8 @@
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
+#include <cstdio>
+#include <io.h>
 #include "context.hpp"
 
 namespace fs = std::filesystem;
@@ -50,17 +52,23 @@ int grep_from_stream(std::istream& in, std::string pattern, Params &par) {
             } else {
                 std::size_t cursor = 0;
                 bool lineMatched = false;
+                const bool useColor = par.highlight == HIGHLIGHT_ALWAYS || (par.highlight == HIGHLIGHT_AUTO && _isatty(_fileno(stdout)));
 
                 for (std::sregex_iterator it(line.begin(), line.end(), re), end;
                     it != end;
                     ++it) {
                     const auto start = static_cast<std::size_t>(it->position());
                     const auto length = static_cast<std::size_t>(it->length());
-
-                    std::cout << line.substr(cursor, start - cursor)
+                    
+                    if(useColor) {
+                        std::cout << line.substr(cursor, start - cursor)
                             << "\033[1;31m"
                             << it->str()
                             << "\033[0m";
+                    } else {
+                        std::cout << line.substr(cursor, start - cursor)
+                            << it->str();
+                    }          
 
                     cursor = start + length;
                     lineMatched = true;
