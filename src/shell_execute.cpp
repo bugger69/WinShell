@@ -293,9 +293,7 @@ int shell_process_launch(std::vector<std::string> &args, STARTUPINFOW &si, PROCE
         WaitForSingleObject(pi.hProcess, INFINITE);
 
         DWORD exit_code;
-        if (GetExitCodeProcess(pi.hProcess, &exit_code)) {
-            std::cout << "Process exited with code: " << exit_code << std::endl;
-        } else {
+        if (!GetExitCodeProcess(pi.hProcess, &exit_code)) {
             std::cerr << "Error: GetExitCodeProcess failed with error code " << GetLastError() << std::endl;
         }
         CloseHandle(outputHandle); // closing output handle 
