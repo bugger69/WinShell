@@ -98,6 +98,27 @@ int read_from_file(std::vector<std::string> args, Params &par) {
     return grep_from_stream(fstr, pattern, par);
 }
 
+int read_from_files(std::vector<std::string> args, Params &par) {
+    std::string pattern(args[0]);
+    std::vector<std::string> arg;
+    bool didget = false;
+    for(int i = 0; i < args.size(); i++) {
+        if(i > 0) {
+            fs::path filepath(args[i]);
+            arg.push_back(args[i]);
+            if(fs::exists(filepath)) {
+                didget += read_from_file(arg, par);
+            } else {
+                std::cerr << "Unable to find file: " << filepath.string() << std::endl;
+            }
+            arg.pop_back();
+        } else {
+            arg.push_back(args[i]);
+        }
+    }
+    return didget;
+}
+
 int main(int argc, char* argv[]) {
     std::vector<std::string> fullArgs(argv + 1, argv + argc);
     std::vector<std::string> args, flags;
@@ -111,5 +132,5 @@ int main(int argc, char* argv[]) {
 
     setParamsFromFlags(flags, par);
 
-    return args.size() > 1 ? read_from_file(args, par) : read_from_stdout(args, par);
+    return args.size() > 1 ? read_from_files(args, par) : read_from_stdout(args, par);
 }
