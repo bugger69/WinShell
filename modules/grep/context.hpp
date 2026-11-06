@@ -14,4 +14,5 @@ class Params {
 public:
     bool onlyMatching = false;
     int highlight = HIGHLIGHT_NONE;
+    bool recursive = false;
 };

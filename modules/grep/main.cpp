@@ -14,6 +14,8 @@ void setParamsFromFlags(std::vector<std::string> &flags, Params &par) {
     for(auto it : flags) {
         if(it == "-o") {
             par.onlyMatching = true;
+        } else if (it == "-r") {
+            par.recursive = true;
         } else if (it.compare(0, 8, "--color=") == 0) {
             std::string mode = "";
             for(size_t i = 0; i < it.size(); i++) {
@@ -102,6 +104,25 @@ int read_from_files(std::vector<std::string> args, Params &par) {
     std::string pattern(args[0]);
     std::vector<std::string> arg;
     bool didget = false;
+    if(par.recursive) {
+        std::vector<std::string> st;
+        while (args.size() > 1) {
+            std::string arg = args[args.size() - 1];
+            st.push_back(arg);
+            args.pop_back();
+        }
+        while(!st.empty()) {
+            fs::path dirpath(st.front());
+            if(fs::is_directory(dirpath)) {
+                for (const fs::directory_entry& entry : fs::recursive_directory_iterator(dirpath)) {
+                    if (entry.is_regular_file()) {
+                        args.push_back(entry.path().string());
+                    }
+                }
+            }
+            st.pop_back();
+        }
+    }
     for(int i = 0; i < args.size(); i++) {
         if(i > 0) {
             fs::path filepath(args[i]);
