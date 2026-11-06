@@ -10,3 +10,7 @@ add_executable(WinShell src/main.cpp src/shell_cmds.cpp src/utils.cpp src/parser
 target_include_directories(WinShell PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 add_subdirectory(modules)
+
+install(TARGETS WinShell hello cat grep
+    RUNTIME DESTINATION bin
+)
