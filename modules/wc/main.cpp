@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <string>
 #include <filesystem>
 #include "context.hpp"
 
@@ -8,6 +9,8 @@ void setMode(std::vector<std::string> &flags, Params &par) {
     for(auto it : flags) {
         if(it == "-c") {
             par.mode = WC_MODE_SIZE;
+        } else if (it == "-l") {
+            par.mode = WC_MODE_LINES;
         }
     }
 }
@@ -17,6 +20,15 @@ int wcFromStream(std::ifstream &fstrm, Params &par) {
         std::streamsize size = fstrm.tellg();
         fstrm.seekg(0, std::ios::beg);
         std::cout << static_cast<int>(size); 
+    } else if (par.mode == WC_MODE_LINES) {
+        std::string line;
+        int count = 0;
+        fstrm.seekg(0, std::ios::beg);
+
+        while(getline(fstrm, line)) {
+            count++;
+        }
+        std::cout << count;
     }
     return 0;
 }
