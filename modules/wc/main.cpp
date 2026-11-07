@@ -1,5 +1,7 @@
 #include <iostream>
+#include <fstream>
 #include <vector>
+#include <filesystem>
 #include "context.hpp"
 
 void setMode(std::vector<std::string> &flags, Params &par) {
@@ -10,8 +12,26 @@ void setMode(std::vector<std::string> &flags, Params &par) {
     }
 }
 
-int readFromFile(std::vector<std::string> &arg, Params &par) {
+int wcFromStream(std::ifstream &fstrm, Params &par) {
+    if(par.mode == WC_MODE_SIZE) {
+        std::streamsize size = fstrm.tellg();
+        fstrm.seekg(0, std::ios::beg);
+        std::cout << static_cast<int>(size); 
+    }
     return 0;
+}
+
+int readFromFile(std::vector<std::string> &arg, Params &par) {
+    fs::path filePath(arg[0]);
+    std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+    int ret;
+    if(!file.is_open()) {
+        std::cerr << "Unable to open file." << std::endl;
+        return -1;
+    }
+    ret = wcFromStream(file, par);
+    if(ret != -1) std::cout << " " << filePath.string() << std::endl;
+    return ret;
 }
 
 int readFromStream(std::vector<std::string> &arg, Params &par) {
