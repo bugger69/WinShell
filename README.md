@@ -60,7 +60,7 @@ For admin(root, requires permissions) installation:
 ```bash
 cmake --install build --prefix "%ProgramFiles%\WinShell\bin"
 ```
-powershell command:
+powershell command for the same:
 ```sh
 cmake --install build --prefix "$env=ProgramFiles\WinShell\bin"
 ```
