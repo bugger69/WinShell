@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <sstream>
 #include "context.hpp"
 
 void setMode(std::vector<std::string> &flags, Params &par) {
@@ -62,7 +63,7 @@ int getStreamChars(std::ifstream &fstrm, Params &par) {
     return count;
 }
 
-int wcFromStream(std::ifstream &fstrm, Params &par) {
+int wcFileStream(std::ifstream &fstrm, Params &par) {
     if(par.mode == WC_MODE_SIZE) {
         std::cout << getStreamBytes(fstrm, par);
     } else if (par.mode == WC_MODE_LINES) {
@@ -85,13 +86,43 @@ int readFromFile(std::vector<std::string> &arg, Params &par) {
         std::cerr << "Unable to open file." << std::endl;
         return -1;
     }
-    ret = wcFromStream(file, par);
+    ret = wcFileStream(file, par);
     if(ret != -1) std::cout << " " << filePath.string() << std::endl;
     return ret;
 }
 
-int readFromStream(std::vector<std::string> &arg, Params &par) {
+int wcStdStream(std::istream &strm, Params &par) {
+    int words = 0, chars = 0, lines = 0;
+    std::string line;
+    while(getline(strm, line)) {
+        std::string word, ln(line);
+        std::istringstream lstrm(ln);
+        lines += 1;
+        chars += line.size();
+        chars += 2;
+        while(lstrm >> word) {
+            words += 1;
+        }
+    }
+    if(par.mode == WC_MODE_SIZE) {
+        std::cout << chars;
+    } else if (par.mode == WC_MODE_LINES) {
+        std::cout << lines;
+    } else if (par.mode == WC_MODE_WORDS) {
+        std::cout << words;
+    } else if (par.mode == WC_MODE_CHARS) {
+        std::cout << chars;
+    } else {
+        std::cout << lines << " " << words << " " << chars;
+    }
     return 0;
+}
+
+int readFromStream(std::vector<std::string> &arg, Params &par) {
+    int ret = 0;
+    ret = wcStdStream(std::cin, par);
+    if(ret != -1) std::cout  << std::endl;
+    return ret;
 }
 
 int main(int argc, char* argv[]) {
