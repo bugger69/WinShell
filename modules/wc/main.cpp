@@ -13,6 +13,8 @@ void setMode(std::vector<std::string> &flags, Params &par) {
             par.mode = WC_MODE_LINES;
         } else if (it == "-w") {
             par.mode = WC_MODE_WORDS;
+        } else if (it == "-m") {
+            par.mode = WC_MODE_CHARS;
         }
     }
 }
@@ -37,6 +39,15 @@ int wcFromStream(std::ifstream &fstrm, Params &par) {
 
         fstrm.seekg(0, std::ios::beg);
         while(fstrm >> word) {
+            count++;
+        }
+        std::cout << count;
+    } else if (par.mode == WC_MODE_CHARS) {
+        char ch;
+        int count = 0;
+
+        fstrm.seekg(0, std::ios::beg);
+        while(fstrm.get(ch)) {
             count++;
         }
         std::cout << count;
