@@ -11,6 +11,8 @@ void setMode(std::vector<std::string> &flags, Params &par) {
             par.mode = WC_MODE_SIZE;
         } else if (it == "-l") {
             par.mode = WC_MODE_LINES;
+        } else if (it == "-w") {
+            par.mode = WC_MODE_WORDS;
         }
     }
 }
@@ -23,9 +25,18 @@ int wcFromStream(std::ifstream &fstrm, Params &par) {
     } else if (par.mode == WC_MODE_LINES) {
         std::string line;
         int count = 0;
-        fstrm.seekg(0, std::ios::beg);
 
+        fstrm.seekg(0, std::ios::beg);
         while(getline(fstrm, line)) {
+            count++;
+        }
+        std::cout << count;
+    } else if (par.mode == WC_MODE_WORDS) {
+        std::string word;
+        int count = 0;
+
+        fstrm.seekg(0, std::ios::beg);
+        while(fstrm >> word) {
             count++;
         }
         std::cout << count;
