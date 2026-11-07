@@ -46,4 +46,25 @@ g++ cat/main.cpp -o cat.exe
 WinShell.exe 
 ```
 
+### Installation
+Per User Installation(replace 'build' with '.' if you're intalling from inside the build directory):
+```bash
+cmake --install build --prefix "%LOCALAPPDATA%\WinShell\bin"
+```
+powershell command:
+```sh
+cmake --install build --prefix "$env=LOCALAPPDATA\WinShell\bin"
+```
+
+For admin(root, requires permissions) installation:
+```bash
+cmake --install build --prefix "%ProgramFiles%\WinShell\bin"
+```
+powershell command:
+```sh
+cmake --install build --prefix "$env=ProgramFiles\WinShell\bin"
+```
+Note: You have it add the respective paths to the path variable yourself atm, will add a installer or something soon.
+
+
 
