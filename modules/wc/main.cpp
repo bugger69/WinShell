@@ -19,38 +19,60 @@ void setMode(std::vector<std::string> &flags, Params &par) {
     }
 }
 
+int getStreamBytes(std::ifstream &fstrm, Params &par) {
+    if(par.mode == WC_MODE_DEF) fstrm.clear();
+    std::streamsize size = fstrm.tellg();
+    fstrm.seekg(0, std::ios::beg);
+    return static_cast<int>(size);
+}
+
+int getStreamLines(std::ifstream &fstrm, Params &par) {
+    std::string line;
+    int count = 0;
+
+    if(par.mode == WC_MODE_DEF) fstrm.clear();
+    fstrm.seekg(0, std::ios::beg);
+    while(getline(fstrm, line)) {
+        count++;
+    }
+    return count;
+}
+
+int getStreamWords(std::ifstream &fstrm, Params &par) {
+    std::string word;
+    int count = 0;
+
+    if(par.mode == WC_MODE_DEF) fstrm.clear();
+    fstrm.seekg(0, std::ios::beg);
+    while(fstrm >> word) {
+        count++;
+    }
+    return count;
+}
+
+int getStreamChars(std::ifstream &fstrm, Params &par) {
+    char ch;
+    int count = 0;
+
+    if(par.mode == WC_MODE_DEF) fstrm.clear();
+    fstrm.seekg(0, std::ios::beg);
+    while(fstrm.get(ch)) {
+        count++;
+    }
+    return count;
+}
+
 int wcFromStream(std::ifstream &fstrm, Params &par) {
     if(par.mode == WC_MODE_SIZE) {
-        std::streamsize size = fstrm.tellg();
-        fstrm.seekg(0, std::ios::beg);
-        std::cout << static_cast<int>(size); 
+        std::cout << getStreamBytes(fstrm, par);
     } else if (par.mode == WC_MODE_LINES) {
-        std::string line;
-        int count = 0;
-
-        fstrm.seekg(0, std::ios::beg);
-        while(getline(fstrm, line)) {
-            count++;
-        }
-        std::cout << count;
+        std::cout << getStreamLines(fstrm, par);
     } else if (par.mode == WC_MODE_WORDS) {
-        std::string word;
-        int count = 0;
-
-        fstrm.seekg(0, std::ios::beg);
-        while(fstrm >> word) {
-            count++;
-        }
-        std::cout << count;
+        std::cout << getStreamWords(fstrm, par);
     } else if (par.mode == WC_MODE_CHARS) {
-        char ch;
-        int count = 0;
-
-        fstrm.seekg(0, std::ios::beg);
-        while(fstrm.get(ch)) {
-            count++;
-        }
-        std::cout << count;
+        std::cout << getStreamChars(fstrm, par);
+    } else {
+        std::cout << getStreamLines(fstrm, par) << " " << getStreamWords(fstrm, par) << " " << getStreamBytes(fstrm, par);
     }
     return 0;
 }
