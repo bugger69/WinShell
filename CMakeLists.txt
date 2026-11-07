@@ -11,6 +11,6 @@ target_include_directories(WinShell PRIVATE ${CMAKE_SOURCE_DIR}/include)
 
 add_subdirectory(modules)
 
-install(TARGETS WinShell hello cat grep
+install(TARGETS WinShell hello cat grep wc
     RUNTIME DESTINATION bin
 )
