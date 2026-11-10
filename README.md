@@ -9,7 +9,7 @@ cat is basically the linux cat tool reimplemented, it served primarily a testing
 
 wc is the word count tool that supports the -c, -l, -m and -w options.
 
-grep is basically, you guessed it right, grep reimplemented in cpp with cpp's regex engine(I'll implement my own regex engine in a later project).
+grep is , you guessed it right, grep reimplemented in cpp with cpp's regex engine(I'll implement my own regex engine in a later project).
 
 compress(still being worked on) is a huffman based encoder-decoder to compress your files.
 
