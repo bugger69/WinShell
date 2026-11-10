@@ -98,15 +98,38 @@ int addTable(std::ofstream &out, std::ifstream &file, std::map<char, prefix> &pr
 }
 
 int addPayload(std::ofstream &out, std::ifstream &file, std::map<char, prefix> &prefixCodes) {
-    int ret = 0;
     char ch;
+    std::uint8_t byte = 0;
+    int bitCount = 0;
     file.seekg(0, std::ios::beg);
     while(file.get(ch)) {
-        for(auto it : prefixCodes[ch].prefixCode) {
-            out.write(reinterpret_cast<const char*>(&it), sizeof(it));
+        const prefix& code = prefixCodes.at(ch);
+        for(int bitIndex = 0; bitIndex < code.length; ++bitIndex) {
+            const std::uint8_t bit = static_cast<std::uint8_t>(
+                (code.prefixCode[bitIndex / 8] >> (7 - (bitIndex % 8))) & 1);
+            byte = static_cast<std::uint8_t>((byte << 1) | bit);
+
+            if(++bitCount == 8) {
+                out.put(static_cast<char>(byte));
+                if(!out) {
+                    std::cerr << "Unable to write encoded payload" << std::endl;
+                    return -1;
+                }
+                byte = 0;
+                bitCount = 0;
+            }
         }
     }
-    return ret;
+
+    if(bitCount > 0) {
+        out.put(static_cast<char>(byte << (8 - bitCount)));
+        if(!out) {
+            std::cerr << "Unable to write encoded payload" << std::endl;
+            return -1;
+        }
+    }
+
+    return 0;
 }
 
 int generateEncodedFile(fs::path &outfile, std::ifstream &file, std::map<char, prefix> &prefixCodes) {
