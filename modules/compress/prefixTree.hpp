@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <optional>
 
 class Node {
 private:
@@ -45,7 +46,7 @@ public:
     PrefixTree& operator=(const PrefixTree&) = delete;
     bool insert(std::vector<Node> n);
     std::string getPrefixCode(char c);
-    char getChar(std::string prefix);
+    std::optional<char> getChar(std::string prefix);
 };
 
 #endif // PREFIXTREE_HPP

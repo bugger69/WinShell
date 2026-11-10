@@ -2,6 +2,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <optional>
 #include "prefixTree.hpp"
 
 /* Node functions */
@@ -17,8 +18,8 @@ Node :: Node(char val, char prefix, int frequency) {
     this->frequency = frequency;
 }
 
-bool Node :: isLeaf() const {
-    return this->val != '\0';
+bool Node::isLeaf() const {
+    return left == nullptr && right == nullptr;
 }
 
 bool Node :: setVal(char c) {
@@ -147,24 +148,26 @@ std::string PrefixTree :: getPrefixCode(char c) {
     return "";
 }
 
-char PrefixTree :: getChar(std::string prefix) {
-    if(root == nullptr || prefix.empty()) return '\0';
+std::optional<char> PrefixTree :: getChar(std::string prefix) {
+    if(root == nullptr || prefix.empty()) return std::nullopt;
     if(root->isLeaf()) {
-        return prefix == "0" ? root->getVal() : '\0';
+        if(prefix == "0") return std::optional<char>(root->getVal());
+        return std::nullopt;
     }
 
     Node* current = root;
     for(char bit : prefix) {
-        if(current->isLeaf()) return '\0';
+        if(current->isLeaf()) return std::nullopt;
         if(bit == '0') {
             current = current->getLeftNode();
         } else if(bit == '1') {
             current = current->getRightNode();
         } else {
-            return '\0';
+            return std::nullopt;
         }
-        if(current == nullptr) return '\0';
+        if(current == nullptr) return std::nullopt;
     }
-    return current->isLeaf() ? current->getVal() : '\0';
+    if(current->isLeaf()) return current->getVal();
+    return std::nullopt;
 }
 
