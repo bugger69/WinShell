@@ -7,6 +7,11 @@
 struct prefix {
     int length;
     std::vector<std::uint8_t> prefixCode;
+
+    bool operator<(const prefix& other) const {
+        if (length != other.length) return length < other.length;
+        return prefixCode < other.prefixCode;
+    }
 };
 
 struct FileHeader {

@@ -26,10 +26,49 @@ int extractHeader(std::ifstream &file, FileHeader &head) {
     return ret;
 }
 
-int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &prefix) {
-    return 0;
+int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &pref) {
+    int ret = 0, crlen = 0;
+
+    while(crlen < head.tblen) {
+        prefix currPre{};
+        char ch;
+        std::size_t bytecount = 0, i = 0;
+        std::uint8_t byte = 0;
+        std::uint8_t len{};
+        if(!file.read(reinterpret_cast<char*>(&ch), sizeof(ch))) {
+            std::cerr << "compress: unable to get char" << std::endl;
+            ret = -1;
+            break;
+        }
+        crlen++;
+        if(!file.read(reinterpret_cast<char*>(&len), sizeof(len))) {
+            std::cerr << "compress: unable to get length" << std::endl;
+            ret = -1;
+            break;
+        }
+        currPre.length = len;
+        crlen++;
+        bytecount = (static_cast<std::size_t>(len) + 7) / 8;
+        while(i < bytecount && file.read(reinterpret_cast<char*>(&byte), sizeof(byte))) {
+            currPre.prefixCode.push_back(byte);
+            crlen++;
+            i++;
+        }
+        for(std::size_t i = 0; i < bytecount; i++) {
+            if(!file.read(reinterpret_cast<char*>(&byte), sizeof(byte))) {
+               std::cerr << "compress: unable to fetch code" << std::endl;
+               ret = -1;
+               break; 
+            }
+            currPre.prefixCode.push_back(byte);
+            crlen++;
+        }
+        pref[currPre] = ch;
+    }
+
+    return ret;
 }
 
-int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &prefix) {
+int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &pref) {
     return 0;
 }

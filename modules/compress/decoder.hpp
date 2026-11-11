@@ -9,5 +9,5 @@
 namespace fs = std::filesystem;
 
 int extractHeader(std::ifstream &file, FileHeader &head);
-int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &prefix);
-int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &prefix);
+int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &pref);
+int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &pref);
