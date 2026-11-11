@@ -65,6 +65,7 @@ int populatePrefix(PrefixTree &tree, std::map<char, prefix> &prefixCodes, std::m
 int addHeader(std::ofstream &out, std::ifstream &file, std::map<char, prefix> &prefixCodes) {
     int ret = 0, origBytes = 0, tblBytes = 0;
     char ch;
+    file.clear();
     file.seekg(0, std::ios::beg);
 
     while(file.get(ch)) {
@@ -101,6 +102,7 @@ int addPayload(std::ofstream &out, std::ifstream &file, std::map<char, prefix> &
     char ch;
     std::uint8_t byte = 0;
     int bitCount = 0;
+    file.clear();
     file.seekg(0, std::ios::beg);
     while(file.get(ch)) {
         const prefix& code = prefixCodes.at(ch);

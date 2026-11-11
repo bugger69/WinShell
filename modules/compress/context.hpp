@@ -11,7 +11,7 @@ struct prefix {
 
 struct FileHeader {
     uint64_t origlen;
-    uint8_t tblen;
+    uint16_t tblen;
 };
 
 #endif // COMPRESS_CONTEXT_HPP
