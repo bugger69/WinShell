@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
         if(ret == 0) ret = extractTable(file, head, prefixCodes);
 
-        if(ret == 0) ret = extractPayloadAndWriteFile(file, head, prefixCodes);
+        if(ret == 0) ret = extractPayloadAndWriteFile(file, head, prefixCodes, filepath);
     } else {
         ret = -1;
     }

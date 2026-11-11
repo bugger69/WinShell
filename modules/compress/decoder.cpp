@@ -49,16 +49,11 @@ int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &
         currPre.length = len;
         crlen++;
         bytecount = (static_cast<std::size_t>(len) + 7) / 8;
-        while(i < bytecount && file.read(reinterpret_cast<char*>(&byte), sizeof(byte))) {
-            currPre.prefixCode.push_back(byte);
-            crlen++;
-            i++;
-        }
         for(std::size_t i = 0; i < bytecount; i++) {
             if(!file.read(reinterpret_cast<char*>(&byte), sizeof(byte))) {
                std::cerr << "compress: unable to fetch code" << std::endl;
                ret = -1;
-               break; 
+               return ret; 
             }
             currPre.prefixCode.push_back(byte);
             crlen++;
@@ -69,6 +64,15 @@ int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &
     return ret;
 }
 
-int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &pref) {
-    return 0;
+int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &pref, fs::path filepath) {
+    int ret = 0;
+    std::string outfile("new" + filepath.filename().string());
+    fs::path outf(outfile);
+    std::ofstream out(outf, std::ios::binary);
+    if(!out.is_open()) {
+        std::cerr << "Unable to open file" << std::endl;
+        ret = -1;
+    }
+
+    return ret;
 }
