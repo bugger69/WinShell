@@ -3,7 +3,6 @@
 #include <map>
 #include <fstream>
 #include <filesystem>
-#include <cstdint>
 #include "prefixTree.hpp"
 #include "encoder.hpp"
 
@@ -36,6 +35,10 @@ int main(int argc, char* argv[]) {
         std::cout << outpath << std::endl;
 
         if(ret == 0) ret = generateEncodedFile(outpath, file, prefixCodes);
+    } else if (args.size() > 1 && args[1] == "decode") {
+
+    } else {
+        ret = -1;
     }
 
     return ret;

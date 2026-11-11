@@ -83,7 +83,7 @@ int addHeader(std::ofstream &out, std::ifstream &file, std::map<char, prefix> &p
     return ret;
 }
 
-int addTable(std::ofstream &out, std::ifstream &file, std::map<char, prefix> &prefixCodes) {
+int addTable(std::ofstream &out, std::map<char, prefix> &prefixCodes) {
     int ret = 0;
     for(auto it : prefixCodes) {
         uint8_t chr = static_cast<uint8_t>(it.first);
@@ -143,7 +143,7 @@ int generateEncodedFile(fs::path &outfile, std::ifstream &file, std::map<char, p
     }
     if(ret == 0) ret = addHeader(out, file, prefixCodes);
 
-    if(ret == 0) ret = addTable(out, file, prefixCodes);
+    if(ret == 0) ret = addTable(out, prefixCodes);
 
     if(ret == 0) ret = addPayload(out, file, prefixCodes);
 
