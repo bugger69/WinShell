@@ -4,13 +4,9 @@
 #include <filesystem>
 #include <cstdint>
 #include "prefixTree.hpp"
+#include "context.hpp"
 
 namespace fs = std::filesystem;
-
-struct prefix {
-    int length;
-    std::vector<std::uint8_t> prefixCode;
-};
 
 int populateFrequencies(std::ifstream& file, std::map<char, int>& frequencies);
 int populateNodes(std::map<char, int>& frequencies, std::vector<Node>& nodes);
