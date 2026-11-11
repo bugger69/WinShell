@@ -5,14 +5,16 @@
 #include <cstdint>
 #include "encoder.hpp"
 
-int extractHeader(fs::path &filepath, FileHeader &head) {
+int extractHeader(std::ifstream &file, FileHeader &head) {
+    int ret = 0;
+
+    return ret;
+}
+
+int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &prefix) {
     return 0;
 }
 
-int extractTable(fs::path &filepath, FileHeader &head, std::map<prefix, char> &prefix) {
-    return 0;
-}
-
-int extractPayloadAndWriteFile(fs::path &filepath, FileHeader &head, std::map<prefix, char> &prefix) {
+int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &prefix) {
     return 0;
 }

@@ -41,12 +41,17 @@ int main(int argc, char* argv[]) {
     } else if (args.size() > 1 && args[1] == "decode") {
         FileHeader head;
         std::map<prefix, char> prefixCodes;
+        std::ifstream file(filepath);
+        if(!fs::is_regular_file(filepath)) {
+            std::cerr << "compress: unable to open file: " << filepath.string() << std::endl;
+            ret = -1;
+        }
 
-        if(ret == 0) ret = extractHeader(filepath, head);
+        if(ret == 0) ret = extractHeader(file, head);
 
-        if(ret == 0) ret = extractTable(filepath, head, prefixCodes);
+        if(ret == 0) ret = extractTable(file, head, prefixCodes);
 
-        if(ret == 0) ret = extractPayloadAndWriteFile(filepath, head, prefixCodes);
+        if(ret == 0) ret = extractPayloadAndWriteFile(file, head, prefixCodes);
     } else {
         ret = -1;
     }
