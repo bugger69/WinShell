@@ -15,14 +15,14 @@ int extractHeader(std::ifstream &file, FileHeader &head) {
         ret = -1;
     }
 
-    head.origlen = origsize;
+    if(ret == 0) head.origlen = origsize;
 
     if(ret != 0 || !file.read(reinterpret_cast<char*>(&tblsize), sizeof(tblsize))) {
         std::cerr << "compress: unable to read table size from the header" << std::endl;
         ret = -1;
     }
 
-    head.tblen = tblsize;
+    if(ret == 0) head.tblen = tblsize;
     return ret;
 }
 
