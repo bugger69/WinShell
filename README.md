@@ -11,7 +11,7 @@ wc is the word count tool that supports the -c, -l, -m and -w options.
 
 grep is , you guessed it right, grep reimplemented in cpp with cpp's regex engine(I'll implement my own regex engine in a later project).
 
-compress(still being worked on) is a huffman based encoder-decoder to compress your files.
+compress is a huffman based encoder-decoder to compress your files. It generates a .cmpr file that only the tool can decode.
 
 ## How to set up and build
 You can build via two ways (I just added cmake just in case the project becomes complicated in the future.)

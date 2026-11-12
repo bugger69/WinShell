@@ -69,7 +69,7 @@ int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<p
     std::uint8_t byte;
     std::size_t len = 0;
     prefix saved{};
-    std::string outfile("new" + filepath.stem().string());
+    std::string outfile(filepath.stem().string());
     fs::path outf(outfile);
     std::ofstream out(outf, std::ios::binary);
 
