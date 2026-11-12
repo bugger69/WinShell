@@ -66,11 +66,41 @@ int extractTable(std::ifstream &file, FileHeader &head, std::map<prefix, char> &
 
 int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<prefix, char> &pref, fs::path filepath) {
     int ret = 0;
-    std::string outfile("new" + filepath.filename().string());
+    std::uint8_t byte;
+    std::size_t len = 0;
+    prefix saved{};
+     std::uint8_t currbyte = 0;
+    std::string outfile("new" + filepath.stem().string());
     fs::path outf(outfile);
     std::ofstream out(outf, std::ios::binary);
+
     if(!out.is_open()) {
         std::cerr << "Unable to open file" << std::endl;
+        ret = -1;
+    }
+
+    while(ret == 0 && file.read(reinterpret_cast<char*>(&byte), sizeof(byte))) {
+        for(int bitIndex = 7; bitIndex >= 0; bitIndex--) {
+            const bool bt = ((byte >> bitIndex) & 1U) != 0;
+            std::size_t byteIndex = saved.length/8;
+            std::size_t bitOffset = 7 - (saved.length % 8);
+            if(byteIndex == saved.prefixCode.size()) {
+                std::uint8_t byte = 0;
+                saved.prefixCode.push_back(byte);
+            }
+            saved.prefixCode[byteIndex] |= bt << bitOffset;
+            saved.length++;
+            if(pref.find(saved) != pref.end()) {
+                out << pref[saved];
+                saved.prefixCode.clear();
+                saved.length = 0;
+            }
+        }
+        len++;
+    }
+
+    if(len != head.origlen) {
+        std::cerr << "compress: Length mismatch" << std::endl;
         ret = -1;
     }
 
