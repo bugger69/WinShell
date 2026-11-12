@@ -91,11 +91,11 @@ int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<p
             saved.length++;
             if(pref.find(saved) != pref.end()) {
                 out << pref[saved];
+                len += sizeof(pref[saved]);
                 saved.prefixCode.clear();
                 saved.length = 0;
             }
         }
-        len++;
     }
 
     if(len != head.origlen) {
