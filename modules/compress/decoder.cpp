@@ -69,7 +69,6 @@ int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<p
     std::uint8_t byte;
     std::size_t len = 0;
     prefix saved{};
-     std::uint8_t currbyte = 0;
     std::string outfile("new" + filepath.stem().string());
     fs::path outf(outfile);
     std::ofstream out(outf, std::ios::binary);
@@ -100,7 +99,17 @@ int extractPayloadAndWriteFile(std::ifstream &file, FileHeader &head, std::map<p
     }
 
     if(len != head.origlen) {
+        std::error_code ec;
+        bool removed;
         std::cerr << "compress: Length mismatch" << std::endl;
+        removed = std::filesystem::remove(outfile, ec);
+        if (ec) {
+            std::cerr << "compress: Could not delete file: " << ec.message() << '\n';
+        } else if (!removed) {
+            std::cout << "compress: File did not exist.\n";
+        } else {
+            std::cout << "compress: File deleted.\n";
+        }
         ret = -1;
     }
 
