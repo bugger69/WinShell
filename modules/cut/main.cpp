@@ -24,18 +24,18 @@ bool toChar(const std::string& text, char& result) {
 }
 
 int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &flags, std::string &file, FlagData &flgdata) {
-    for(auto it : args) {
-        if(!it.empty() && it.front() == '-') {
-            if(it.starts_with("-d")) {
-                std::string prefix = it.substr(0, 2);
-                std::string del = it.substr(2, it.size());
+    for(size_t i = 0; i < args.size(); i++) {
+        if(!args[i].empty() && args[i].front() == '-') {
+            if(args[i].starts_with("-d")) {
+                std::string prefix = args[i].substr(0, 2);
+                std::string del = args[i].substr(2, args[i].size());
                 char delimiter;
                 if(toChar(del, delimiter)) {
                     flgdata.delimiter = delimiter;
                 } else {
                     std::cerr << "cut: invalid delimiter" << std::endl;
                 }
-            } else flags.push_back(it);
+            } else flags.push_back(args[i]);
         }
     }
     if(!args.empty() && (args.back().empty() || args.back().front() != '-')) file = args.back();
