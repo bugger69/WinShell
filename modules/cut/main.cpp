@@ -42,14 +42,14 @@ int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &f
     return 0;
 }
 
-int dumpKthField(std::ifstream &fstrm, int k, char delimiter = '\t') {
+int dumpKthField(std::ifstream &fstrm, std::set<int> &allowed, char delimiter = '\t') {
     std::string line;
     while(getline(fstrm, line)) {
         std::string word;
         std::stringstream ln(line);
-        int i = 0;
+        int i = 1;
         while(getline(ln, word, delimiter)) {
-            if(i == k) std::cout << word;
+            if(allowed.find(i) != allowed.end()) std::cout << word;
             i++;
         }
         std::cout << std::endl;
@@ -76,7 +76,8 @@ int main(int argc, char* argv[]) {
             std::cerr << "cut: Unable to open file" << std::endl;
             ret = -1;
         }
-        if(ret == 0) ret = dumpKthField(file, 2, flgdata.delimiter);
+        flgdata.allowed.insert(2);
+        if(ret == 0) ret = dumpKthField(file, flgdata.allowed, flgdata.delimiter);
     }
     return ret;
 }
