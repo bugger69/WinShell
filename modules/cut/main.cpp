@@ -23,6 +23,10 @@ bool toChar(const std::string& text, char& result) {
     return false;
 }
 
+int populateRanges(std::string &ranges, std::set<int> &rset) {
+    return 0;
+}
+
 int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &flags, std::string &file, FlagData &flgdata) {
     for(size_t i = 0; i < args.size(); i++) {
         if(!args[i].empty() && args[i].front() == '-') {
@@ -34,6 +38,16 @@ int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &f
                     flgdata.delimiter = delimiter;
                 } else {
                     std::cerr << "cut: invalid delimiter" << std::endl;
+                }
+            } else if (args[i].starts_with("-f")) {
+                std::string pre = args[i].substr(0, 2);
+                std::string ranges = args[i].substr(2, args[i].size());
+                if(ranges.empty()) {
+                    ranges = args[++i];
+                }
+                if(!populateRanges(ranges, flgdata.allowed)) {
+                    std::cerr << "cut: please enter valid arguments for -f" << std::endl;
+                    return -1;
                 }
             } else flags.push_back(args[i]);
         }
