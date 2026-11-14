@@ -3,6 +3,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <charconv>
+#include <algorithm>
 #include "context.hpp"
 
 bool toChar(const std::string& text, char& result) {
@@ -23,7 +25,48 @@ bool toChar(const std::string& text, char& result) {
     return false;
 }
 
+int toInt(std::string &txt, int &val) {
+    auto [end, error] = std::from_chars(txt.data(), txt.data() + txt.size(), val);
+    if (error == std::errc{} && end == txt.data() + txt.size()) {
+        return 0;
+    } else {
+        std::cerr << "cut: unable to convert int" << std::endl;
+        return -1;
+    }
+}
+
 int populateRanges(std::string &ranges, std::set<int> &rset) {
+    std::vector<std::vector<int>> rvec;
+    std::string curr;
+    for(int i = 0; i < ranges.size(); i++) {
+        int val;
+        bool addtovec = false;
+        int ibef = i;
+        if(i > 0 && (ranges[i - 1] == ',' || ranges[i - 1] == ' ')) addtovec = true;
+        while(i < ranges.size() && ranges[i] >= '0' && ranges[i] <= '9') {
+            curr += ranges[i];
+            i++;
+        }
+        if(toInt(curr, val)) {
+            std::cerr << "cut: Unable to convert ranges" << std::endl;
+            return -1;
+        } else if (addtovec && !rvec.empty()) {
+            if(rvec[rvec.size() - 1].size() == 1) rvec[rvec.size() - 1].push_back(val);
+            for(auto rngs : rvec) {
+                sort(rngs.begin(), rngs.end());
+                for(size_t k = rngs[0]; k <= rngs[rngs.size() - 1]; k++) {
+                    rset.insert(k);
+                }
+            }
+        } else if (ranges[i] == ',' || ranges[i] == ' ') {
+            std::vector<int> ivec;
+            ivec.push_back(val);
+            rvec.push_back(ivec);
+        } else {
+            rset.insert(val);
+        }
+        curr = "";
+    }
     return 0;
 }
 
@@ -33,6 +76,7 @@ int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &f
             if(args[i].starts_with("-d")) {
                 std::string prefix = args[i].substr(0, 2);
                 std::string del = args[i].substr(2, args[i].size());
+                flags.push_back(prefix);
                 char delimiter;
                 if(toChar(del, delimiter)) {
                     flgdata.delimiter = delimiter;
@@ -42,10 +86,11 @@ int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &f
             } else if (args[i].starts_with("-f")) {
                 std::string pre = args[i].substr(0, 2);
                 std::string ranges = args[i].substr(2, args[i].size());
+                flags.push_back(pre);
                 if(ranges.empty()) {
                     ranges = args[++i];
                 }
-                if(!populateRanges(ranges, flgdata.allowed)) {
+                if(populateRanges(ranges, flgdata.allowed)) {
                     std::cerr << "cut: please enter valid arguments for -f" << std::endl;
                     return -1;
                 }
@@ -63,7 +108,7 @@ int dumpKthField(std::ifstream &fstrm, std::set<int> &allowed, char delimiter = 
         std::stringstream ln(line);
         int i = 1;
         while(getline(ln, word, delimiter)) {
-            if(allowed.find(i) != allowed.end()) std::cout << word;
+            if(allowed.find(i) != allowed.end()) std::cout << word << '\t';
             i++;
         }
         std::cout << std::endl;
@@ -90,7 +135,7 @@ int main(int argc, char* argv[]) {
             std::cerr << "cut: Unable to open file" << std::endl;
             ret = -1;
         }
-        flgdata.allowed.insert(2);
+        // flgdata.allowed.insert(2);
         if(ret == 0) ret = dumpKthField(file, flgdata.allowed, flgdata.delimiter);
     }
     return ret;
