@@ -37,11 +37,10 @@ int toInt(std::string &txt, int &val) {
 
 int populateRanges(std::string &ranges, std::set<int> &rset) {
     std::vector<std::vector<int>> rvec;
-    std::string curr;
     for(int i = 0; i < ranges.size(); i++) {
         int val;
+        std::string curr;
         bool addtovec = false;
-        int ibef = i;
         if(i > 0 && (ranges[i - 1] == ',' || ranges[i - 1] == ' ')) addtovec = true;
         while(i < ranges.size() && ranges[i] >= '0' && ranges[i] <= '9') {
             curr += ranges[i];
@@ -65,7 +64,6 @@ int populateRanges(std::string &ranges, std::set<int> &rset) {
         } else {
             rset.insert(val);
         }
-        curr = "";
     }
     return 0;
 }
@@ -135,7 +133,6 @@ int main(int argc, char* argv[]) {
             std::cerr << "cut: Unable to open file" << std::endl;
             ret = -1;
         }
-        // flgdata.allowed.insert(2);
         if(ret == 0) ret = dumpKthField(file, flgdata.allowed, flgdata.delimiter);
     }
     return ret;
