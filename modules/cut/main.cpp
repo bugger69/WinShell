@@ -87,6 +87,7 @@ int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &f
                 flags.push_back(pre);
                 if(ranges.empty()) {
                     ranges = args[++i];
+                    args.erase(args.begin() + i);
                 }
                 if(populateRanges(ranges, flgdata.allowed)) {
                     std::cerr << "cut: please enter valid arguments for -f" << std::endl;
@@ -99,7 +100,7 @@ int populateFlagOpts(std::vector<std::string> &args, std::vector<std::string> &f
     return 0;
 }
 
-int dumpKthField(std::ifstream &fstrm, std::set<int> &allowed, char delimiter = '\t') {
+int dumpKthField(std::istream &fstrm, std::set<int> &allowed, char delimiter = '\t') {
     std::string line;
     while(getline(fstrm, line)) {
         std::string word;
@@ -134,6 +135,8 @@ int main(int argc, char* argv[]) {
             ret = -1;
         }
         if(ret == 0) ret = dumpKthField(file, flgdata.allowed, flgdata.delimiter);
+    } else {
+        if(ret == 0) ret = dumpKthField(std::cin, flgdata.allowed, flgdata.delimiter);
     }
     return ret;
 }
