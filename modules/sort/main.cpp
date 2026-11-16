@@ -1,6 +1,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <fstream>
+#include "context.hpp"
 
 int extractArgsAndFlags(std::vector<std::string> &args, std::vector<std::string> &arg, std::vector<std::string> &flags) {
     for(auto it : args) {
@@ -13,7 +15,23 @@ int extractArgsAndFlags(std::vector<std::string> &args, std::vector<std::string>
     return 0;
 }
 
+int sortedInsert(std::istream &strm, std::vector<std::string> &output) {
+    return 0;
+}
+
 int sortFile(std::vector<std::string> &arg, std::vector<std::string> &flags) {
+    fs::path filepath(arg[0]);
+    std::ifstream file(filepath);
+    std::vector<std::string> sortedFile;
+
+    if(sortedInsert(file, sortedFile)) {
+        std::cerr << "sort: unable to sort" << std::endl;
+    }
+
+    for(auto it : sortedFile) {
+        std::cout << it << std::endl;
+    }
+
     return 0;
 }
 
