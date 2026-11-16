@@ -3,7 +3,13 @@
 #include <string>
 
 int extractArgsAndFlags(std::vector<std::string> &args, std::vector<std::string> &arg, std::vector<std::string> &flags) {
-    
+    for(auto it : args) {
+        if(it.starts_with('-')) {
+            flags.push_back(it);
+        } else {
+            arg.push_back(it);
+        }
+    }
     return 0;
 }
 
