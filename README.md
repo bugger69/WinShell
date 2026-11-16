@@ -3,7 +3,7 @@
 ## Features
 This was supposed to be a basic shell designed for windows. Now it has become a collection of tools I have made, ranging from a windows based shell to a file compressor.
 
-Winshell features the following shell commands : cd, echo, exit, type, pwd, help, complete (-C, -d, -f and -p flags only and for now only .exe completer executables, and bash scripts if you have git installed, for now), jobs, history and is capable of finding executables from path variable in type, executing them when called and run processes as well as some shell commands in the background. Plus I've added basic file/error buffer redirections and autocomplete for shell commands and executables. I've also added support for basic functions like tab(autocomplete) and up/down/left/right arrow keys.
+Winshell features the following shell commands : cd, echo, exit, type, pwd, help, complete (-C, -d, -f and -p flags only and for now only .exe completer executables, and bash scripts if you have git installed, for now), jobs, history and is capable of finding executables from path variable in type, executing them when called and run processes as well as some shell commands in the background. Plus I've added basic file/error buffer redirections and autocomplete for shell commands and executables. I've also added support for basic functions like tab(autocomplete) and up/down/left/right arrow keys. Lastly, I've also added support for piping commands.
 
 cat is basically the linux cat tool reimplemented, it served primarily a testing purpose for Winshell.
 
