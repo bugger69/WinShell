@@ -15,7 +15,7 @@ int extractArgsAndFlags(std::vector<std::string> &args, std::vector<std::string>
     return 0;
 }
 
-int sort(std::istream &strm, std::vector<std::string> &output) {
+int sort(std::istream &strm, std::vector<std::string> &flags, std::vector<std::string> &output) {
     return 0;
 }
 
@@ -24,7 +24,7 @@ int sortFile(std::vector<std::string> &arg, std::vector<std::string> &flags) {
     std::ifstream file(filepath);
     std::vector<std::string> sortedFile;
 
-    if(sort(file, sortedFile)) {
+    if(sort(file, flags, sortedFile)) {
         std::cerr << "sort: unable to sort" << std::endl;
     }
 
