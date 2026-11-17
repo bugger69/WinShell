@@ -15,7 +15,18 @@ int extractArgsAndFlags(std::vector<std::string> &args, std::vector<std::string>
     return 0;
 }
 
+int sortedInsert(std::vector<std::string> &output, std::string &line) {
+    return 0;
+}
+
 int sort(std::istream &strm, std::vector<std::string> &flags, std::vector<std::string> &output) {
+    std::string line;
+    while(getline(strm, line)) {
+        if(sortedInsert(output, line)) {
+            std::cerr << "sort: unable to insert" << std::endl;
+            return -1;
+        }
+    }
     return 0;
 }
 
