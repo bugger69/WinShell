@@ -16,6 +16,13 @@ int extractArgsAndFlags(std::vector<std::string> &args, std::vector<std::string>
 }
 
 int sortedInsert(std::vector<std::string> &output, std::string &line) {
+    for(std::size_t i = 0; i < output.size(); i++) {
+        if(line < output[i]) {
+            output.insert(output.begin() + i, line);
+            return 0;
+        }
+    }
+    output.push_back(line);
     return 0;
 }
 
