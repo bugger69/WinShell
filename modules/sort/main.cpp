@@ -35,7 +35,7 @@ int sortedInsert(std::vector<std::string> &output, std::string &line) {
     return 0;
 }
 
-int sort(std::istream &strm, std::vector<std::string> &flags, std::vector<std::string> &output, FlagOptions &opts) {
+int sort(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
     std::string line;
     while(getline(strm, line)) {
         if(sortedInsert(output, line)) {
@@ -46,12 +46,12 @@ int sort(std::istream &strm, std::vector<std::string> &flags, std::vector<std::s
     return 0;
 }
 
-int sortFile(std::vector<std::string> &arg, std::vector<std::string> &flags, FlagOptions &opts) {
+int sortFile(std::vector<std::string> &arg, FlagOptions &opts) {
     fs::path filepath(arg[0]);
     std::ifstream file(filepath);
     std::vector<std::string> sortedFile;
 
-    if(sort(file, flags, sortedFile, opts)) {
+    if(sort(file, sortedFile, opts)) {
         std::cerr << "sort: unable to sort" << std::endl;
     }
 
@@ -62,7 +62,7 @@ int sortFile(std::vector<std::string> &arg, std::vector<std::string> &flags, Fla
     return 0;
 }
 
-int sortStream(std::vector<std::string> &arg, std::vector<std::string> &flags, FlagOptions &opts) {
+int sortStream(std::vector<std::string> &arg, FlagOptions &opts) {
     return 0;
 }
 
@@ -77,9 +77,9 @@ int main (int argc, char* argv[]) {
     ret = setFlagOpts(flags, opts);
 
     if(arg.size() >= 1) {
-        if(ret == 0) ret = sortFile(arg, flags, opts);
+        if(ret == 0) ret = sortFile(arg, opts);
     } else {
-        if(ret == 0) ret = sortStream(arg, flags, opts); 
+        if(ret == 0) ret = sortStream(arg, opts); 
     }
 
     return ret;
