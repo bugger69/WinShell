@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <unordered_set>
 #include "context.hpp"
 
 int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
@@ -50,13 +51,21 @@ int sortFile(std::vector<std::string> &arg, FlagOptions &opts) {
     fs::path filepath(arg[0]);
     std::ifstream file(filepath);
     std::vector<std::string> sortedFile;
+    std::unordered_set<std::string> uniq;
 
     if(sort(file, sortedFile, opts)) {
         std::cerr << "sort: unable to sort" << std::endl;
     }
 
     for(auto it : sortedFile) {
-        std::cout << it << std::endl;
+        if(opts.unique) {
+            if(uniq.find(it) == uniq.end()) {
+                uniq.insert(it);
+                std::cout << it << std::endl;
+            }
+        } else {
+            std::cout << it << std::endl;
+        }
     }
 
     return 0;
