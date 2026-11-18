@@ -5,6 +5,11 @@
 #include "context.hpp"
 
 int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
+    for(auto it : flags) {
+        if(it == "-u") {
+            opts.unique = true;
+        }
+    }
     return 0;
 }
 
