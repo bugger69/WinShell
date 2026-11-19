@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <unordered_set>
+#include <algorithm>
 #include "context.hpp"
 
 int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
@@ -45,7 +45,7 @@ int sortedInsert(std::vector<std::string> &output, std::string &line) {
     return 0;
 }
 
-int sort(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
+int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
     std::string line;
     while(getline(strm, line)) {
         if(opts.sortType == SORT_TYPE_INSERT) {
@@ -70,7 +70,7 @@ int sortFile(std::vector<std::string> &arg, FlagOptions &opts) {
     std::string prev;
     bool hasPrev = false;
 
-    if(sort(file, sortedFile, opts)) {
+    if(sortWithType(file, sortedFile, opts)) {
         std::cerr << "sort: unable to sort" << std::endl;
     }
 
