@@ -56,6 +56,10 @@ int sort(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts
         }
     }
 
+    if(opts.sortType == SORT_TYPE_DEF) {
+        sort(output.begin(), output.end());
+    }
+
     return 0;
 }
 
