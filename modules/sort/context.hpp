@@ -7,5 +7,5 @@ namespace fs = std::filesystem;
 class FlagOptions {
 public:
     bool unique = false;
-    int sort = SORT_TYPE_INSERT;
+    int sortType = SORT_TYPE_INSERT;
 };

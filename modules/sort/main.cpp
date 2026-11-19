@@ -9,6 +9,14 @@ int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
     for(auto it : flags) {
         if(it == "-u") {
             opts.unique = true;
+        } else if (it.starts_with("--sort=")) {
+            std::string pre = it.substr(0, 6);
+            std::string sort = it.substr(7, it.size());
+            if(sort == "insertion") {
+                opts.sortType = SORT_TYPE_INSERT;
+            } else {
+                std::cerr << "sort: Invalid sort type, switching to default" << std::endl;
+            }
         }
     }
     return 0;
@@ -39,9 +47,11 @@ int sortedInsert(std::vector<std::string> &output, std::string &line) {
 int sort(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
     std::string line;
     while(getline(strm, line)) {
-        if(sortedInsert(output, line)) {
-            std::cerr << "sort: unable to insert" << std::endl;
-            return -1;
+        if(opts.sortType == SORT_TYPE_INSERT) {
+            if(sortedInsert(output, line)) {
+                std::cerr << "sort: unable to insert" << std::endl;
+                return -1;
+            }
         }
     }
     return 0;
