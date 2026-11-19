@@ -15,7 +15,8 @@ int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
             if(sort == "insertion") {
                 opts.sortType = SORT_TYPE_INSERT;
             } else {
-                std::cerr << "sort: Invalid sort type, switching to default" << std::endl;
+                std::cerr << "sort: Invalid sort type" << std::endl;
+                return -1;
             }
         }
     }
@@ -51,9 +52,10 @@ int sort(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts
             if(sortedInsert(output, line)) {
                 std::cerr << "sort: unable to insert" << std::endl;
                 return -1;
-            }
+            } else output.push_back(line);
         }
     }
+
     return 0;
 }
 
