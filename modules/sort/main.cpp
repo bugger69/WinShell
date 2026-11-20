@@ -14,6 +14,8 @@ int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
             std::string sort = it.substr(7, it.size());
             if(sort == "insertion") {
                 opts.sortType = SORT_TYPE_INSERT;
+            } else if (sort == "merge") {
+                opts.sortType = SORT_TYPE_MERGE;
             } else {
                 std::cerr << "sort: Invalid sort type" << std::endl;
                 return -1;
@@ -45,6 +47,10 @@ int sortedInsert(std::vector<std::string> &output, std::string &line) {
     return 0;
 }
 
+int mergeSort(std::vector<std::string> &output) {
+    return 0;
+}
+
 int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
     std::string line;
     while(getline(strm, line)) {
@@ -58,6 +64,8 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
 
     if(opts.sortType == SORT_TYPE_DEF) {
         sort(output.begin(), output.end());
+    } else if (opts.sortType == SORT_TYPE_MERGE) {
+        mergeSort(output);
     }
 
     return 0;
