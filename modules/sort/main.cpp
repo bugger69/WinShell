@@ -47,7 +47,12 @@ int sortedInsert(std::vector<std::string> &output, std::string &line) {
     return 0;
 }
 
+int sortedMerge(std::vector<std::string> &output, int left, int mid, int right) {
+    return 0;
+}
+
 int mergeSort(std::vector<std::string> &output) {
+
     return 0;
 }
 
