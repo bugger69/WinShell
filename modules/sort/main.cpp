@@ -77,12 +77,13 @@ int sortedMerge(std::vector<std::string> &output, std::size_t left, std::size_t 
     return 0;
 }
 
-int mergeSort(std::vector<std::string> &output, int first, int last) {
+int mergeSort(std::vector<std::string> &output, std::size_t first, std::size_t last) {
     int ret = 0;
+    if(first >= last - 1) return ret;
     std::size_t mid = first + (last - first) / 2;
     ret = mergeSort(output, first, mid);
-    ret = mergeSort(output, mid, last);
-    ret = sortedMerge(output, first, mid, last);
+    if(ret == 0) ret = mergeSort(output, mid, last);
+    if(ret == 0) ret = sortedMerge(output, first, mid, last);
     return ret;
 }
 
@@ -98,8 +99,10 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
     }
 
     if(opts.sortType == SORT_TYPE_DEF) {
+        std::cout << "Default sort" << std::endl;
         sort(output.begin(), output.end());
     } else if (opts.sortType == SORT_TYPE_MERGE) {
+        std::cout << "Entering merge sort" << std::endl;
         mergeSort(output, 0, output.size());
     }
 
