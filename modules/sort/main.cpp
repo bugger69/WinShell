@@ -47,13 +47,43 @@ int sortedInsert(std::vector<std::string> &output, std::string &line) {
     return 0;
 }
 
-int sortedMerge(std::vector<std::string> &output, int left, int mid, int right) {
+int sortedMerge(std::vector<std::string> &output, std::size_t left, std::size_t mid, std::size_t right) {
+    std::vector<std::string> arr1(output.begin() + left, output.begin() + mid), arr2(output.begin() + mid, output.begin() + right);
+    std::size_t s1 = arr1.size(), s2 = arr2.size(), i = left, a = 0, b = 0;
+    while(a < s1 && b < s2) {
+        if(arr1[a] > arr2[b]) {
+            output[i] = arr2[b];
+            b++;
+        } else {
+            output[i] = arr1[a];
+            a++;
+        }
+        i++;
+    }
+    if(a < s1) {
+        while(a < s1) {
+            output[i] = arr1[a];
+            i++;
+            a++;
+        }
+    }
+    if(b < s2) {
+        while(b < s2) {
+            output[i] = arr2[b];
+            i++;
+            b++;
+        }
+    }
     return 0;
 }
 
-int mergeSort(std::vector<std::string> &output) {
-
-    return 0;
+int mergeSort(std::vector<std::string> &output, int first, int last) {
+    int ret = 0;
+    std::size_t mid = first + (last - first) / 2;
+    ret = mergeSort(output, first, mid);
+    ret = mergeSort(output, mid, last);
+    ret = sortedMerge(output, first, mid, last);
+    return ret;
 }
 
 int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
@@ -70,7 +100,7 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
     if(opts.sortType == SORT_TYPE_DEF) {
         sort(output.begin(), output.end());
     } else if (opts.sortType == SORT_TYPE_MERGE) {
-        mergeSort(output);
+        mergeSort(output, 0, output.size());
     }
 
     return 0;
