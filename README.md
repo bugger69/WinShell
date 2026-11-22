@@ -13,7 +13,7 @@ grep is, you guessed it right, grep reimplemented in cpp with cpp's regex engine
 
 compress is a huffman based encoder-decoder to compress your files. It generates a .cmpr file that only the tool can decode.
 
-sort is a sorting tool that can execute several types of sort algorithms based on your needs. By default it uses the stl sort algorithm, and also supports a basic insertion sort. It's supposed to provide support for merge, radix, heap and quick sort depending on your needs.
+sort is a sorting tool that can execute several types of sort algorithms based on your needs. By default it uses the stl sort algorithm, and also supports a basic insertion sort and merge sort. It's supposed to provide support for radix, heap and quick sort too depending on your needs.
 
 ## How to set up and build
 You can build via two ways (I just added cmake just in case the project becomes complicated in the future.)
