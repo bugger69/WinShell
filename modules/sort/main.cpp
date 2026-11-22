@@ -93,8 +93,8 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
             if(sortedInsert(output, line)) {
                 std::cerr << "sort: unable to insert" << std::endl;
                 return -1;
-            } else output.push_back(line);
-        }
+            }
+        } else output.push_back(line);
     }
 
     if(opts.sortType == SORT_TYPE_DEF) {
