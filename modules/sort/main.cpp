@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "context.hpp"
 
+/* Flags and argument processing helpers*/
 int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
     for(auto it : flags) {
         if(it == "-u") {
@@ -16,6 +17,8 @@ int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
                 opts.sortType = SORT_TYPE_INSERT;
             } else if (sort == "merge") {
                 opts.sortType = SORT_TYPE_MERGE;
+            } else if (sort == "quick") {
+                opts.sortType = SORT_TYPE_QUICK;
             } else {
                 std::cerr << "sort: Invalid sort type" << std::endl;
                 return -1;
@@ -36,6 +39,7 @@ int extractArgsAndFlags(std::vector<std::string> &args, std::vector<std::string>
     return 0;
 }
 
+/* Insertion sort helpers */
 int sortedInsert(std::vector<std::string> &output, std::string &line) {
     for(std::size_t i = 0; i < output.size(); i++) {
         if(line < output[i]) {
@@ -47,6 +51,7 @@ int sortedInsert(std::vector<std::string> &output, std::string &line) {
     return 0;
 }
 
+/* Merge sort helpers */
 int sortedMerge(std::vector<std::string> &output, std::size_t left, std::size_t mid, std::size_t right) {
     std::vector<std::string> arr1(output.begin() + left, output.begin() + mid), arr2(output.begin() + mid, output.begin() + right);
     std::size_t s1 = arr1.size(), s2 = arr2.size(), i = left, a = 0, b = 0;
@@ -87,6 +92,12 @@ int mergeSort(std::vector<std::string> &output, std::size_t first, std::size_t l
     return ret;
 }
 
+/* Quick Sort Helper */
+int quickSort(std::vector<std::string> &output, std::size_t first, std::size_t last) {
+    return 0;
+}
+
+/* Sort handler */
 int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
     std::string line;
     while(getline(strm, line)) {
@@ -102,6 +113,8 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
         sort(output.begin(), output.end());
     } else if (opts.sortType == SORT_TYPE_MERGE) {
         mergeSort(output, 0, output.size());
+    } else if (opts.sortType == SORT_TYPE_QUICK) {
+        quickSort(output, 0, output.size());
     }
 
     return 0;
