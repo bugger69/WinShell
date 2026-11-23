@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <random>
 #include "context.hpp"
 
 /* Flags and argument processing helpers*/
@@ -93,12 +94,15 @@ int mergeSort(std::vector<std::string> &output, std::size_t first, std::size_t l
 }
 
 /* Quick Sort Helper */
-int getPivot(std::vector<std::string> &output, std::size_t first, std::size_t last) {
-    int pivot = 0;
+int getPivot(std::size_t first, std::size_t last) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<std::size_t> distrib(first, last - 1);
+    int pivot = distrib(gen);
     return pivot;
 }
 int partition(std::vector<std::string> &output, std::size_t first, std::size_t last) {
-    int pivot = getPivot(output, first, last);
+    int pivot = getPivot(first, last);
     return pivot;
 }
 
