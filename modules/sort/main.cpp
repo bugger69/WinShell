@@ -99,10 +99,8 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
     }
 
     if(opts.sortType == SORT_TYPE_DEF) {
-        std::cout << "Default sort" << std::endl;
         sort(output.begin(), output.end());
     } else if (opts.sortType == SORT_TYPE_MERGE) {
-        std::cout << "Entering merge sort" << std::endl;
         mergeSort(output, 0, output.size());
     }
 
