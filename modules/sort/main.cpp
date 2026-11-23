@@ -101,8 +101,18 @@ int getPivot(std::size_t first, std::size_t last) {
     int pivot = distrib(gen);
     return pivot;
 }
+
 int partition(std::vector<std::string> &output, std::size_t first, std::size_t last) {
     int pivot = getPivot(first, last);
+    std::string pivEl = output[pivot];
+    int i = first, j = first;
+    while(j < last) {
+        if(output[j] <= pivEl) {
+            std::swap(output[i], output[j]);
+            i++;
+        }
+        j++;
+    }
     return pivot;
 }
 
