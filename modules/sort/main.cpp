@@ -106,17 +106,24 @@ int partition(std::vector<std::string> &output, std::size_t first, std::size_t l
     int pivot = getPivot(first, last);
     std::string pivEl = output[pivot];
     int i = first, j = first;
-    while(j < last) {
+    std::swap(output[pivot], output[last - 1]);
+    while(j < last - 1) {
         if(output[j] <= pivEl) {
             std::swap(output[i], output[j]);
             i++;
         }
         j++;
     }
+    pivot = i;
+    std::swap(output[i], output[last - 1]);
     return pivot;
 }
 
 int quickSort(std::vector<std::string> &output, std::size_t first, std::size_t last) {
+    if(last - first <= 1) return 0;
+    int pivot = partition(output, first, last);
+    quickSort(output, first, pivot);
+    quickSort(output, pivot + 1, last);
     return 0;
 }
 
