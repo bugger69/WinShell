@@ -93,6 +93,15 @@ int mergeSort(std::vector<std::string> &output, std::size_t first, std::size_t l
 }
 
 /* Quick Sort Helper */
+int getPivot(std::vector<std::string> &output, std::size_t first, std::size_t last) {
+    int pivot = 0;
+    return pivot;
+}
+int partition(std::vector<std::string> &output, std::size_t first, std::size_t last) {
+    int pivot = getPivot(output, first, last);
+    return pivot;
+}
+
 int quickSort(std::vector<std::string> &output, std::size_t first, std::size_t last) {
     return 0;
 }
