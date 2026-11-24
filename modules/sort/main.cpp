@@ -127,7 +127,12 @@ int quickSort(std::vector<std::string> &output, std::size_t first, std::size_t l
     return 0;
 }
 
-/* Sort handler */
+/* Heap Sort Handler*/
+int heapSort(std::vector<std::string> &output) {
+    return 0;
+}
+
+/* Sort Handler */
 int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
     std::string line;
     while(getline(strm, line)) {
