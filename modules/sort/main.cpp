@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <random>
 #include "context.hpp"
+#include "minHeap.hpp"
 
 /* Flags and argument processing helpers*/
 int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
@@ -131,6 +132,14 @@ int quickSort(std::vector<std::string> &output, std::size_t first, std::size_t l
 
 /* Heap Sort Handler*/
 int heapSort(std::vector<std::string> &output) {
+    MinHeap heap;
+    for(auto it : output) {
+        heap.push(it);
+    }
+    output.clear();
+    while(!heap.empty()) {
+        output.push_back(heap.pop());
+    }
     return 0;
 }
 
