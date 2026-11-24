@@ -20,6 +20,8 @@ int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
                 opts.sortType = SORT_TYPE_MERGE;
             } else if (sort == "quick") {
                 opts.sortType = SORT_TYPE_QUICK;
+            } else if (sort == "heap") {
+                opts.sortType = SORT_TYPE_HEAP;
             } else {
                 std::cerr << "sort: Invalid sort type" << std::endl;
                 return -1;
@@ -150,6 +152,8 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
         mergeSort(output, 0, output.size());
     } else if (opts.sortType == SORT_TYPE_QUICK) {
         quickSort(output, 0, output.size());
+    } else if (opts.sortType == SORT_TYPE_HEAP) {
+        heapSort(output);
     }
 
     return 0;
