@@ -13,5 +13,9 @@ int MinHeap::push(std::string) {
 }
 
 std::string MinHeap::pop() {
+    if(empty()) return "";
 
+    std::string top = this->minheap[0];
+    this->minheap.erase(this->minheap.begin());
+    return top;
 }
