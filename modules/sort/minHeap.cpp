@@ -50,7 +50,7 @@ bool MinHeap::empty() {
 
 int MinHeap::push(std::string str) {
     this->minheap.push_back(str);
-    this->siftUp(0);
+    this->siftUp(this->minheap.size() - 1);
     return 0;
 }
 
