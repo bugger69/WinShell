@@ -27,7 +27,21 @@ std::size_t MinHeap::siftUp(std::size_t index) {
 
 std::size_t MinHeap::siftDown(std::size_t index) {
     if(this->minheap.empty()) return -1;
-    return 0;
+    int curr = index;
+    while(curr < this->minheap.size()) {
+        std::size_t left = curr * 2 + 1;
+        std::size_t right = curr * 2 + 2;
+        std::vector<std::size_t> children = {left, right};
+        int small = curr;
+        for(auto it : children) {
+            if(this->minheap[small] > this->minheap[it]) small = it;
+        }
+        if(small != curr) {
+            std::swap(this->minheap[curr], this->minheap[small]);
+            curr = small;
+        } else break;
+    }
+    return curr;
 }
 
 bool MinHeap::empty() {
