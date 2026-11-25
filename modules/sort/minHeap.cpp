@@ -22,6 +22,14 @@ int MinHeap::heapify() {
 
 std::size_t MinHeap::siftUp(std::size_t index) {
     if(this->minheap.empty()) return -1;
+    std::size_t curr = index;
+    while (curr > 0) {
+        std::size_t root = ((curr + 1) / 2) - 1;
+        if(this->minheap[root] > this->minheap[curr]) {
+            std::swap(this->minheap[root], this->minheap[curr]);
+            curr = root;
+        } else break;
+    }
     return 0;
 }
 
