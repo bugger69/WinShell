@@ -13,6 +13,7 @@ int MinHeap::heapify() {
         std::vector<std::size_t> children = {left, right};
         std::size_t toswap = i;
         for(auto it : children) {
+            if(it > this->minheap.size() - 1) continue;
             if(this->minheap[toswap] > this->minheap[it]) toswap = it;
         }
         if(toswap != i) std::swap(this->minheap[i], this->minheap[toswap]);
@@ -25,7 +26,7 @@ std::size_t MinHeap::siftUp(std::size_t index) {
     std::size_t curr = index;
     while (curr > 0) {
         std::size_t root = ((curr + 1) / 2) - 1;
-        if(this->minheap[root] > this->minheap[curr]) {
+        if(root >= 0 && this->minheap[root] > this->minheap[curr]) {
             std::swap(this->minheap[root], this->minheap[curr]);
             curr = root;
         } else break;
@@ -42,6 +43,7 @@ std::size_t MinHeap::siftDown(std::size_t index) {
         std::vector<std::size_t> children = {left, right};
         int small = curr;
         for(auto it : children) {
+            if(it > this->minheap.size() - 1) continue;
             if(this->minheap[small] > this->minheap[it]) small = it;
         }
         if(small != curr) {
