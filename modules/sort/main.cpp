@@ -171,7 +171,7 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
     } else if (opts.sortType == SORT_TYPE_HEAP) {
         heapSort(output);
     } else if (opts.sortType == SORT_TYPE_RADIX) {
-
+        radixSort(output);
     }
 
     return 0;
