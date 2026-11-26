@@ -23,6 +23,8 @@ int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
                 opts.sortType = SORT_TYPE_QUICK;
             } else if (sort == "heap") {
                 opts.sortType = SORT_TYPE_HEAP;
+            } else if (sort == "radis") {
+                opts.sortType = SORT_TYPE_RADIX;
             } else {
                 std::cerr << "sort: Invalid sort type" << std::endl;
                 return -1;
@@ -143,6 +145,11 @@ int heapSort(std::vector<std::string> &output) {
     return 0;
 }
 
+/* Radix Sort Handler */
+int radixSort(std::vector<std::string> &output) {
+    return 0;
+}
+
 /* Sort Handler */
 int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptions &opts) {
     std::string line;
@@ -163,6 +170,8 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
         quickSort(output, 0, output.size());
     } else if (opts.sortType == SORT_TYPE_HEAP) {
         heapSort(output);
+    } else if (opts.sortType == SORT_TYPE_RADIX) {
+
     }
 
     return 0;
