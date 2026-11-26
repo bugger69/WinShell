@@ -69,7 +69,7 @@ std::string MinHeap::pop() {
 
     std::string top = this->minheap[0];
     std::swap(this->minheap[0], this->minheap[this->minheap.size() - 1]);
-    this->siftDown(0);
     this->minheap.erase(minheap.begin() + this->minheap.size() - 1);
+    this->siftDown(0);
     return top;
 }
