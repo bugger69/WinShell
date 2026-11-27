@@ -155,16 +155,16 @@ int getMax(std::vector<std::string> &output) {
     return size;
 }
 
-int radixSort(std::vector<std::string> &output) {
+int radixSort(std::vector<std::string> &output, std::size_t ind) {
     std::map<char, std::vector<std::string>> buckets;
 
     if(output.size() <= 1) return 0;
     for(auto it : output) {
-        buckets[it[0]].push_back(it);
+        buckets[it[ind]].push_back(it);
     }
 
     for(auto it : buckets) {
-        radixSort(it.second);
+        radixSort(it.second, ind + 1);
     }
 
     output.clear();
@@ -197,7 +197,7 @@ int sortWithType(std::istream &strm, std::vector<std::string> &output, FlagOptio
     } else if (opts.sortType == SORT_TYPE_HEAP) {
         heapSort(output);
     } else if (opts.sortType == SORT_TYPE_RADIX) {
-        radixSort(output);
+        radixSort(output, 0);
     }
 
     return 0;
