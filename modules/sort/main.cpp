@@ -4,6 +4,7 @@
 #include <fstream>
 #include <algorithm>
 #include <random>
+#include <map>
 #include "context.hpp"
 #include "minHeap.hpp"
 
@@ -155,6 +156,23 @@ int getMax(std::vector<std::string> &output) {
 }
 
 int radixSort(std::vector<std::string> &output) {
+    std::map<char, std::vector<std::string>> buckets;
+
+    if(output.size() <= 1) return 0;
+    for(auto it : output) {
+        buckets[it[0]].push_back(it);
+    }
+
+    for(auto it : buckets) {
+        radixSort(it.second);
+    }
+
+    output.clear();
+    for(auto it : buckets) {
+        for(auto it1 : it.second) {
+            output.push_back(it1);
+        }
+    }
     return 0;
 }
 
