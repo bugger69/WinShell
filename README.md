@@ -7,7 +7,7 @@ Winshell features the following shell commands : cd, echo, exit, type, pwd, help
 
 cat is basically the linux cat tool reimplemented, it served primarily a testing purpose for Winshell.
 
-cut cuts out selected portions of a file (useful for files organised as rows and columns) and it allows you to select your own delimiters, column index, no of rows and many more things.
+cut cuts out selected portions of a file (useful for files organised as rows and columns) and it allows you to select your own delimiters, column index, no of rows and many more things. It's options include -d and -f in two formats "1 2" and 1,2.
 
 wc is the word count tool that supports the -c, -l, -m and -w options.
 
