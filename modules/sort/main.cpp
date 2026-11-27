@@ -157,10 +157,12 @@ int getMax(std::vector<std::string> &output) {
 
 int radixSort(std::vector<std::string> &output, std::size_t ind) {
     std::map<char, std::vector<std::string>> buckets;
+    std::vector<std::string> finished;
 
     if(output.size() <= 1) return 0;
     for(auto it : output) {
-        buckets[it[ind]].push_back(it);
+        if(it.size() <= ind)  finished.push_back(it);
+        else buckets[it[ind]].push_back(it);
     }
 
     for(auto it : buckets) {
@@ -168,6 +170,9 @@ int radixSort(std::vector<std::string> &output, std::size_t ind) {
     }
 
     output.clear();
+    for(auto it : finished) {
+        output.push_back(it);
+    }
     for(auto it : buckets) {
         for(auto it1 : it.second) {
             output.push_back(it1);
