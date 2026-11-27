@@ -7,6 +7,8 @@ Winshell features the following shell commands : cd, echo, exit, type, pwd, help
 
 cat is basically the linux cat tool reimplemented, it served primarily a testing purpose for Winshell.
 
+cut cuts out selected portions of a file (useful for files organised as rows and columns) and it allows you to select your own delimiters, column index, no of rows and many more things.
+
 wc is the word count tool that supports the -c, -l, -m and -w options.
 
 grep is, you guessed it right, grep reimplemented in cpp with cpp's regex engine(I'll implement my own regex engine in a later project).
