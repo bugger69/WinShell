@@ -24,7 +24,7 @@ int setFlagOpts(std::vector<std::string> &flags, FlagOptions &opts) {
                 opts.sortType = SORT_TYPE_QUICK;
             } else if (sort == "heap") {
                 opts.sortType = SORT_TYPE_HEAP;
-            } else if (sort == "radis") {
+            } else if (sort == "radix") {
                 opts.sortType = SORT_TYPE_RADIX;
             } else {
                 std::cerr << "sort: Invalid sort type" << std::endl;
