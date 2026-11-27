@@ -147,14 +147,6 @@ int heapSort(std::vector<std::string> &output) {
 }
 
 /* Radix Sort Handler */
-int getMax(std::vector<std::string> &output) {
-    int size = 0;
-    for(auto it : output) {
-        if(it.size() > size) size = it.size();
-    }
-    return size;
-}
-
 int radixSort(std::vector<std::string> &output, std::size_t ind) {
     std::map<char, std::vector<std::string>> buckets;
     std::vector<std::string> finished;
